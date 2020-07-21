@@ -2,13 +2,6 @@
 
 #include <assert.h>
 
-const size_t DEFAULT_CHUNK_SIZE = 4096;
-
-const size_t UNSIGNED_CHAR_MAX = UCHAR_MAX;
-
-const unsigned DefaultNumberOfBlocks = 8;
-
-
 void Chunk::Initialize(std::size_t blockSize, unsigned char numberOfBlocks)
 {
 	m_PointerToData = new unsigned char[blockSize * numberOfBlocks];
