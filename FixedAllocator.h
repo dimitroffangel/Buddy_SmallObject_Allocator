@@ -5,7 +5,6 @@
 
 #include "Chunk.h"
 
-
 class FixedAllocator
 {
 private:
@@ -18,8 +17,8 @@ private:
 	unsigned char m_NumberOfBlocks;
 
 	Chunks m_Chunks;
-	Chunk* m_RecentlyAllocatedChunk;
-	Chunk* m_RecentlyDeallocatedChunk;
+	Chunk* m_RecentlyAllocatedChunk = nullptr;
+	Chunk* m_RecentlyDeallocatedChunk = nullptr;
 
 	FixedAllocator* m_PreviousFixedAlloc = nullptr;
 	FixedAllocator* m_NextFixedAlloc = nullptr;

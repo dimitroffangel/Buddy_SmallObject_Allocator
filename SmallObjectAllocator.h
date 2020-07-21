@@ -5,8 +5,11 @@
 
 #include "FixedAllocator.h"
 
+const int MAX_SMALL_OBJECT_SIZE = 64;
+
 class SmallObjectAllocator
 {
+
 public:
 	SmallObjectAllocator(std::size_t chunkSize, std::size_t maxObjectSize);
 
@@ -23,5 +26,13 @@ public:
 	std::size_t m_ChunkSize;
 	std::size_t m_MaxObjectSize;
 };
+
+bool InitializeGlobalSmallObjectAllocator();
+
+bool InitializeGlobalSmallObjectAllocator(const int chunkSize, const int maxSmallObjectSize);
+
+void DeleteGlobalSmallObjectAllocator();
+
+extern SmallObjectAllocator* g_SmallObjectAllocator;
 
 #endif

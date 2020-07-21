@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 
-#include "Chunk.h"
+#include "SmallObject.h"
 
 class Foo
 {
@@ -23,8 +23,8 @@ void Test(Foo* foo1, Foo* foo2)
 
 int main()
 {
-	//const int blocks = 4;
-	//int sizeOfFoo = sizeof(Foo);
+	const int blocks = 4;
+	int sizeOfFoo = sizeof(Foo);
 
 	//Chunk chunk;
 	//chunk.Initialize(sizeOfFoo, blocks);
@@ -39,11 +39,9 @@ int main()
 	//Foo* currentPtr = static_cast<Foo*>(chunk.Allocate(sizeOfFoo));
 	//*currentPtr = Foo();
 
-	Foo* pointer = new Foo();
 
-	Foo* foo = nullptr;
-
-	std::cout << (pointer < foo) << '\n';
+	SmallObject smallObject;
+	void* result = smallObject.operator new(sizeOfFoo);
 
 	return 0;
 }

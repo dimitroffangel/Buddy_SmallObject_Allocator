@@ -47,6 +47,7 @@ FixedAllocator::~FixedAllocator()
 FixedAllocator::FixedAllocator(const FixedAllocator& other)
 {
 	m_NumberOfBlocks = other.m_NumberOfBlocks;
+	m_BlockSize = other.m_BlockSize;
 
 	m_Chunks = std::vector<Chunk>(other.m_Chunks.begin(), other.m_Chunks.end());
 
@@ -70,11 +71,11 @@ FixedAllocator& FixedAllocator::operator=(const FixedAllocator& rhs)
 
 		m_Chunks = std::vector<Chunk>(rhs.m_Chunks.begin(), rhs.m_Chunks.end());
 
-		m_RecentlyAllocatedChunk = rhs.m_RecentlyAllocatedChunk;
-		m_RecentlyDeallocatedChunk = rhs.m_RecentlyDeallocatedChunk;
+		//m_RecentlyAllocatedChunk = rhs.m_RecentlyAllocatedChunk;
+		//m_RecentlyDeallocatedChunk = rhs.m_RecentlyDeallocatedChunk;
 
-		m_PreviousFixedAlloc = rhs.m_PreviousFixedAlloc;
-		m_NextFixedAlloc = rhs.m_NextFixedAlloc;
+		//m_PreviousFixedAlloc = rhs.m_PreviousFixedAlloc;
+		//m_NextFixedAlloc = rhs.m_NextFixedAlloc;
 	}
 
 	return *this;

@@ -35,7 +35,7 @@ void* SmallObjectAllocator::Allocate(std::size_t numberOfBytes)
 
 	if (it == m_Pool.end())
 	{
-		it = m_Pool.insert(it, FixedAllocator(numberOfBytes));
+		it = m_Pool.insert(it, std::move(FixedAllocator(numberOfBytes)));
 		m_PointerToLastDeallocator = &(*m_Pool.begin());
 		//m_PointerToLastDeallocator += sizeof(FixedAllocator);
 	}
@@ -79,4 +79,35 @@ void SmallObjectAllocator::Deallocate(void* pointer, std::size_t numberOfBytes)
 
 	m_PointerToLastDeallocator = &(*it);
 	m_PointerToLastDeallocator->Deallocate(pointer);
+}
+
+SmallObjectAllocator* g_SmallObjectAllocator = nullptr;
+
+bool InitializeGlobalSmallObjectAllocator()
+{
+	if (g_SmallObjectAllocator != nullptr)
+	{
+		return false;
+	}
+
+	g_SmallObjectAllocator = new SmallObjectAllocator(DEFAULT_CHUNK_SIZE, MAX_SMALL_OBJECT_SIZE);
+
+	return true;
+}
+
+bool InitializeGlobalSmallObjectAllocator(const int chunkSize, const int maxSmallObjectSize)
+{
+	if (g_SmallObjectAllocator != nullptr)
+	{
+		return false;
+	}
+
+	g_SmallObjectAllocator = new SmallObjectAllocator(chunkSize, maxSmallObjectSize);
+
+	return true;
+}
+
+void DeleteGlobalSmallObjectAllocator()
+{
+	delete g_SmallObjectAllocator;
 }
