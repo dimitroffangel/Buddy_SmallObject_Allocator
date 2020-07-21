@@ -106,7 +106,7 @@ void FixedAllocator::DoDeallocation(void* pointer)
 				lastChunk.Release();
 				m_Chunks.pop_back();
 
-				// m_RecentlyAllocatedChunk is pointing to sumething invalid
+				// m_RecentlyDeallocatedChunk is pointing to something invalid
 				m_RecentlyAllocatedChunk = m_RecentlyDeallocatedChunk = &m_Chunks.front();
 			}
 
@@ -125,7 +125,8 @@ void FixedAllocator::DoDeallocation(void* pointer)
 		else
 		{
 			// when swapping what happens with the address ??
-			std::swap(*m_RecentlyDeallocatedChunk, lastChunk);
+			std::swap(*m_RecentlyDeallocatedChunk, m_Chunks.back());
+			m_Chunks.back().Release();
 			m_Chunks.pop_back();
 
 			// should not be used
@@ -139,6 +140,7 @@ Chunk* FixedAllocator::FindChunkWithPointer(void* pointer)
 	if (pointer == nullptr)
 	{
 		std::cerr << "FixedAllocator::FindChunkWithPointer argument is nullptr " << '\n';
+		return nullptr;
 	}
 
 	assert(!m_Chunks.empty());

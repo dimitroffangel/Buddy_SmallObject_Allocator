@@ -59,6 +59,8 @@ int main()
 		Foo* result = static_cast<Foo*>(smallObject.operator new(sizeOfFoo));
 
 		*result = Foo();
+		result->a = i;
+		
 		foos.push_back(result);
 
 	//	Foo* result1 = new Foo();
@@ -71,6 +73,9 @@ int main()
 
 		//smallObject.operator delete(foos[size - i - 1], sizeOfFoo);
 		smallObject.operator delete(foos[i], sizeOfFoo);
+
+
+		std::cout << size - i - 1 << " " << foos[size - i - 1]->a << "\n" ;
 	}
 
 	ShutdownSystems();	

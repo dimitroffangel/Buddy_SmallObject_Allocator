@@ -58,6 +58,12 @@ void* Chunk::Allocate(std::size_t blockSize)
 
 void Chunk::Deallocate(void* deallocatePointer, std::size_t blockSize)
 {
+	if(deallocatePointer == nullptr)
+	{
+		std::cerr << "Chunk::Deallocate void* deallocatePointer is nullptr" << '\n';
+		return;
+	}
+
 	assert(deallocatePointer >= m_PointerToData);
 
 	unsigned char* toReleasePointer = static_cast<unsigned char*>(deallocatePointer);
