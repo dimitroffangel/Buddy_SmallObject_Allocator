@@ -32,6 +32,7 @@ public:
 
 	void* Allocate();
 	void Deallocate(void* pointer);
+
 	std::size_t BlockSize() const
 	{
 		return m_BlockSize;

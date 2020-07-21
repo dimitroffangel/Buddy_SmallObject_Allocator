@@ -80,11 +80,14 @@ FixedAllocator& FixedAllocator::operator=(const FixedAllocator& rhs)
 	return *this;
 }
 
-
-
 void FixedAllocator::DoDeallocation(void* pointer)
 {
-	// that holds the nullptr check
+	if (pointer == nullptr)
+	{
+		std::cerr << "FixedAllocator::DoDeallocation() pointer is nullptr" << '\n';
+		return;
+	}
+
 	assert(m_RecentlyDeallocatedChunk->m_PointerToData <= pointer);
 	assert(m_RecentlyDeallocatedChunk->m_PointerToData + (m_NumberOfBlocks * m_BlockSize) > pointer);
 
@@ -246,7 +249,8 @@ void FixedAllocator::Deallocate(void* pointer)
 	assert(&m_Chunks.back() >= m_RecentlyDeallocatedChunk);
 
 	m_RecentlyDeallocatedChunk = FindChunkWithPointer(pointer);
-	assert(m_RecentlyDeallocatedChunk);
+
+	assert(m_RecentlyDeallocatedChunk != nullptr);
 
 	DoDeallocation(pointer);
 }
