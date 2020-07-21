@@ -2,7 +2,6 @@
 
 std::mutex SmallObject::m_LockOperation;
 
-
 void* SmallObject::operator new(size_t size)
 {
 	std::lock_guard<std::mutex> guardian(m_LockOperation);

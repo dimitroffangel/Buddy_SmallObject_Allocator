@@ -44,5 +44,8 @@
     <ClInclude Include="SmallObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SharedHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

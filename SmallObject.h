@@ -11,19 +11,9 @@ public:
 	static void* operator new(size_t size);
 	static void operator delete(void* pointer, size_t size);
 
-	SmallObject()
-	{
-		InitializeGlobalSmallObjectAllocator();
-	}
-
-	SmallObject(const int chunkSize, const int maxSmallObjectSize)
-	{
-		InitializeGlobalSmallObjectAllocator(chunkSize, maxSmallObjectSize);
-	}
-
 	virtual ~SmallObject()
 	{
-
+		
 	}
 
 private:

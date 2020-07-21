@@ -1,6 +1,6 @@
 #include "SmallObjectAllocator.h"
 
-#include <cassert>
+#include <assert.h>
 
 SmallObjectAllocator::SmallObjectAllocator(std::size_t chunkSize, std::size_t maxObjectSize)
 	:
@@ -83,31 +83,18 @@ void SmallObjectAllocator::Deallocate(void* pointer, std::size_t numberOfBytes)
 
 SmallObjectAllocator* g_SmallObjectAllocator = nullptr;
 
-bool InitializeGlobalSmallObjectAllocator()
+void SmallObjectAllocator::Initialize()
 {
-	if (g_SmallObjectAllocator != nullptr)
-	{
-		return false;
-	}
-
 	g_SmallObjectAllocator = new SmallObjectAllocator(DEFAULT_CHUNK_SIZE, MAX_SMALL_OBJECT_SIZE);
 
-	return true;
 }
 
-bool InitializeGlobalSmallObjectAllocator(const int chunkSize, const int maxSmallObjectSize)
+void SmallObjectAllocator::Initialize(const int chunkSize, const int maxSmallObjectSize)
 {
-	if (g_SmallObjectAllocator != nullptr)
-	{
-		return false;
-	}
-
 	g_SmallObjectAllocator = new SmallObjectAllocator(chunkSize, maxSmallObjectSize);
-
-	return true;
 }
 
-void DeleteGlobalSmallObjectAllocator()
+void SmallObjectAllocator::Shutdown()
 {
 	delete g_SmallObjectAllocator;
 }

@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <functional>
 
 #include "SmallObject.h"
 
@@ -10,19 +11,27 @@ public:
 	int b = 32;
 	std::string test = "42";
 
-	Foo()
+
+	int TryStuff(int c, int d, int f) const
 	{
-		
+		return a + (c+d);
 	}
 };
 
-void Test(Foo* foo1, Foo* foo2)
+void InitializeSystems()
 {
-	std::cout << (foo1 < foo2);
+	SmallObjectAllocator::Initialize();
+}
+
+void ShutdownSystems()
+{
+	SmallObjectAllocator::Shutdown();
 }
 
 int main()
 {
+	InitializeSystems();
+
 	const int blocks = 4;
 	int sizeOfFoo = sizeof(Foo);
 
@@ -42,6 +51,9 @@ int main()
 
 	SmallObject smallObject;
 	void* result = smallObject.operator new(sizeOfFoo);
+
+
+	ShutdownSystems();
 
 	return 0;
 }

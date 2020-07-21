@@ -1,7 +1,7 @@
 #include "FixedAllocator.h"
 
 #include <vector>
-#include <cassert>
+#include <assert.h>
 
 FixedAllocator::FixedAllocator(std::size_t blockSize)
 	:m_BlockSize(blockSize)
