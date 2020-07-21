@@ -11,9 +11,9 @@ const unsigned DefaultNumberOfBlocks = 8;
 
 struct Chunk
 {
-	void Initialize(std::size_t blockSize, unsigned char blocks);
+	void Initialize(std::size_t blockSize, unsigned char numberOfBlocks);
 	void Release();
-	void Reset(std::size_t blockSize, unsigned char blocks);
+	void Reset(std::size_t blockSize, unsigned char numberOfBlocks);
 	void* Allocate(std::size_t blockSize);
 	void Deallocate(void* pointer, std::size_t blockSize);
 	unsigned char* m_PointerToData;

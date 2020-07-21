@@ -38,8 +38,8 @@ int main()
 
 	//Foo* fooPtr = static_cast<Foo*>(chunk.Allocate(sizeOfFoo));
 
-	//*fooPtr = Foo();
-	//fooPtr->b = 5;
+	// *fooPtr = Foo();
+	// fooPtr->b = 5;
 
 	//chunk.Deallocate(fooPtr, sizeof(Foo));
 
@@ -69,7 +69,8 @@ int main()
 	{
 		//delete foos[i];
 
-		smallObject.operator delete(foos[size - i - 1], sizeOfFoo);
+		//smallObject.operator delete(foos[size - i - 1], sizeOfFoo);
+		smallObject.operator delete(foos[i], sizeOfFoo);
 	}
 
 	ShutdownSystems();	
