@@ -9,8 +9,6 @@ const size_t UNSIGNED_CHAR_MAX = UCHAR_MAX;
 
 const unsigned DefaultNumberOfBlocks = 8;
 
-
-
 struct Chunk
 {
 	void Initialize(std::size_t blockSize, unsigned char blocks);

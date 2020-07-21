@@ -5,6 +5,8 @@
 #include <functional>
 #include <vector>
 
+#include "Chunk.h"
+
 template <class T> 
 class SharedHandler
 {
@@ -27,6 +29,7 @@ public:
 	{
 		if (*m_ReferenceCounter == 1)
 		{
+			m_AfterDeletionDelegate(m_Pointer);
 			delete m_Pointer;
 			delete m_ReferenceCounter;
 			return;
@@ -42,6 +45,7 @@ public:
 			// if it is the last object remembering that object, annihilate it
 			if (m_ReferenceCounter == 1)
 			{
+				m_AfterDeletionDelegate(m_Pointer);
 				delete m_ReferenceCounter;
 				delete m_Pointer;
 			}
@@ -67,7 +71,7 @@ public:
 	{
 		if (m_Pointer == nullptr)
 		{
-			std::cout << "SharedHandler::operator-> m_Pointer is nullpt" << '\n';
+			std::cout << "SharedHandler::operator-> m_Pointer is nullptr" << '\n';
 			return;
 		}
 
@@ -78,6 +82,7 @@ public:
 private:
 	T* m_Pointer = nullptr;
 	size_t* m_ReferenceCounter = nullptr;
+	std::function<void<const Chunk&, void*, size_t>> m_AfterDeletionDelegate;
 };
 
 #endif

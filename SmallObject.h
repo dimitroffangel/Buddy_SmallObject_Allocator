@@ -8,8 +8,8 @@
 class SmallObject
 {
 public:
-	static void* operator new(size_t size);
-	static void operator delete(void* pointer, size_t size);
+	__declspec(allocator) static void* operator new(size_t size);
+	__declspec(allocator) static void operator delete(void* pointer, size_t size);
 
 	virtual ~SmallObject()
 	{

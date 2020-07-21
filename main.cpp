@@ -9,8 +9,6 @@ class Foo
 public:
 	int a = 42;
 	int b = 32;
-	std::string test = "42";
-
 
 	int TryStuff(int c, int d, int f) const
 	{
@@ -50,10 +48,31 @@ int main()
 
 
 	SmallObject smallObject;
-	void* result = smallObject.operator new(sizeOfFoo);
 
+	const int size = 1000000;
 
-	ShutdownSystems();
+	std::vector<Foo*> foos;
+	foos.reserve(size);
+
+	for (size_t i = 0; i < size; i++)
+	{
+		Foo* result = static_cast<Foo*>(smallObject.operator new(sizeOfFoo));
+
+		*result = Foo();
+		foos.push_back(result);
+
+	//	Foo* result1 = new Foo();
+	//	foos.push_back(result1);
+	}
+
+	for (size_t i = 0; i < size; i++)
+	{
+		//delete foos[i];
+
+		smallObject.operator delete(foos[size - i - 1], sizeOfFoo);
+	}
+
+	ShutdownSystems();	
 
 	return 0;
 }
