@@ -28,7 +28,8 @@ void ShutdownSystems()
 
 int main()
 {
-	InitializeSystems();
+	SmallObjectAllocator::Initialize();
+
 
 	const int blocks = 4;
 	int sizeOfFoo = sizeof(Foo);
@@ -78,7 +79,7 @@ int main()
 		std::cout << size - i - 1 << " " << foos[size - i - 1]->a << "\n" ;
 	}
 
-	ShutdownSystems();	
+	SmallObjectAllocator::Shutdown();
 
 	return 0;
 }
