@@ -3,6 +3,7 @@
 #include <functional>
 
 #include "SmallObject.h"
+#include "BuddyAllocator.h"
 
 class Foo
 {
@@ -34,10 +35,14 @@ void ShutdownSystems()
 
 
 int main()
-{
-	int foo = 42;
-	int* c = &foo;
-	unsigned b = (unsigned)(c);
+{	
+	std::cout << FastOperationsWithTwo::IsPowerOfTwo(2);
+
+	PtrInt test = -1;
+
+	//int foo = 42;
+	//int* c = &foo;
+	//unsigned b = (unsigned)(c);
 
 	return 0;
 

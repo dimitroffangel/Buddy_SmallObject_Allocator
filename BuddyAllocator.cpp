@@ -4,7 +4,7 @@
 
 void BuddyAllocator::Initialize()
 {
-	m_PointerToData = new PtrInt[DEFAULT_CHUNK_SIZE];
+	m_PointerToData = new PtrInt[DEFAULT_BUDDY_ALLOCATOR_SIZE];
 
 	m_FreeLists[0] = m_PointerToData;
 
@@ -27,7 +27,17 @@ void* BuddyAllocator::Allocate(size_t blockSize)
 
 	// assert some stuff...
 
-	size_t initialLevel = FastLogarithm::log2_64(blockSize) + 1;
+	size_t initialLevel;
+	
+	if (FastOperationsWithTwo::IsPowerOfTwo(blockSize))
+	{
+		initialLevel = FastLogarithm::log2_64(blockSize);
+	}
+	else
+	{
+		initialLevel = FastLogarithm::log2_64(blockSize) + 1;
+	}
+
 	size_t levelSize = GetSizeOfLevel(initialLevel);
 	int level = initialLevel;
 

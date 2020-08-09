@@ -125,6 +125,7 @@
   <ItemGroup>
     <ClCompile Include="BuddyAllocator.cpp" />
     <ClCompile Include="Chunk.cpp" />
+    <ClCompile Include="FastLogarithm.cpp" />
     <ClCompile Include="FixedAllocator.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="SmallObject.cpp" />

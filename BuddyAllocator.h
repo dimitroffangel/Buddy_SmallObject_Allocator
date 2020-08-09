@@ -13,13 +13,7 @@
 	(1 << numberOfLevels) - 1 - number of indices
 */
 
-#ifdef _WIN64
-	using PtrInt = unsigned long long;
-#else
-	using PtrInt = unsigned;
-#endif
-
-const uint64_t DEFAULT_CHUNK_SIZE = 1 << 16;
+const uint64_t DEFAULT_BUDDY_ALLOCATOR_SIZE = 1 << 16;
 const uint64_t LEAF_SIZE = 1 << 7;
 
 struct BuddyAllocator
