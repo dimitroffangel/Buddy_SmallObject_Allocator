@@ -14,6 +14,11 @@ public:
 	{
 		return a + (c+d);
 	}
+
+	//~Foo()
+	//{
+	//	std::cout << "Losing Foo" << '\n';
+	//}
 };
 
 void InitializeSystems()
@@ -26,8 +31,17 @@ void ShutdownSystems()
 	SmallObjectAllocator::Shutdown();
 }
 
+
+
 int main()
 {
+	int foo = 42;
+	int* c = &foo;
+	unsigned b = (unsigned)(c);
+
+	return 0;
+
+
 	SmallObjectAllocator::Initialize();
 
 
@@ -57,9 +71,10 @@ int main()
 
 	for (size_t i = 0; i < size; i++)
 	{
-		Foo* result = static_cast<Foo*>(smallObject.operator new(sizeOfFoo));
+		void* rawPointer = smallObject.operator new(sizeOfFoo);
 
-		*result = Foo();
+
+		Foo* result = new (rawPointer) Foo();
 		result->a = i;
 		
 		foos.push_back(result);
@@ -71,12 +86,13 @@ int main()
 	for (size_t i = 0; i < size; i++)
 	{
 		//delete foos[i];
-
+		
+		foos[i]->~Foo();
 		//smallObject.operator delete(foos[size - i - 1], sizeOfFoo);
 		smallObject.operator delete(foos[i], sizeOfFoo);
+		
 
-
-		std::cout << size - i - 1 << " " << foos[size - i - 1]->a << "\n" ;
+		//std::cout << size - i - 1 << " " << foos[size - i - 1]->a << "\n" ;
 	}
 
 	SmallObjectAllocator::Shutdown();
