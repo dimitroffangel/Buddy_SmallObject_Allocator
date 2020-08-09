@@ -38,11 +38,17 @@ int main()
 {	
 	std::cout << FastOperationsWithTwo::IsPowerOfTwo(2);
 
-	PtrInt test = -1;
+	PtrInt* foo = new PtrInt(42);
+
+	PtrInt test = (PtrInt)(foo);
+
+	PtrInt* res = (PtrInt*)(test);
 
 	//int foo = 42;
 	//int* c = &foo;
 	//unsigned b = (unsigned)(c);
+
+
 
 	return 0;
 

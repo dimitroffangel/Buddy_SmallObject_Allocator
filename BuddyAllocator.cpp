@@ -61,6 +61,9 @@ void* BuddyAllocator::Allocate(size_t blockSize)
 				m_FreeLists[level + 1] = freeSlot;
 				*freeSlot = (PtrInt)(freeSlot + GetSizeOfLevel(level));
 
+				*(freeSlot + GetSizeOfLevel(level)) = (PtrInt)nullptr;
+
+
 				++level;
 			}
 		}
