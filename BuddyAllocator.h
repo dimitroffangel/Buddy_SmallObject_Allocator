@@ -36,11 +36,11 @@ public:
 	void* Allocate(size_t blockSize);
 
 private:
-	PtrInt* m_FreeLists[MAX_LEVELS];
+	void* m_FreeLists[MAX_LEVELS];
 	std::bitset<NUMBER_OF_BITSET_FOR_FREE_TABLE> m_FreeTable;
 	size_t m_NumberOfLevels;
 
-	PtrInt* m_PointerToData;
+	unsigned char* m_PointerToData;
 	
 	inline size_t GetTotalSize() 
 	{
@@ -74,7 +74,7 @@ private:
 
 	inline size_t IndexInLevelOf(void* pointer, size_t levelIndex)
 	{
-		PtrInt* getUnsignedCharPointer = static_cast<PtrInt*>(pointer);
+		unsigned char* getUnsignedCharPointer = static_cast<unsigned char*>(pointer);
 
 		return (getUnsignedCharPointer - m_PointerToData) / GetSizeOfLevel(levelIndex);
 	}

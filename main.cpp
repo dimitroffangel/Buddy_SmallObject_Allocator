@@ -36,8 +36,18 @@ void ShutdownSystems()
 
 int main()
 {	
-	BuddyAllocator buddyAllocator;
-	buddyAllocator.Initialize();
+	unsigned* arr = new unsigned[5];
+
+	for (size_t i = 0; i < 5; ++i)
+	{
+		arr[i] = i;
+	
+		std::cout << (char)(arr[i] + 65);
+	}
+	
+	
+
+	std::cout << sizeof(int);
 
 	//std::cout << FastOperationsWithTwo::IsPowerOfTwo(2);
 

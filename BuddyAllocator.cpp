@@ -5,7 +5,7 @@
 
 void BuddyAllocator::Initialize()
 {
-	m_PointerToData = new PtrInt[DEFAULT_BUDDY_ALLOCATOR_SIZE];
+	m_PointerToData = new unsigned char[DEFAULT_BUDDY_ALLOCATOR_SIZE];
 
 	m_FreeLists[0] = m_PointerToData;
 
@@ -34,32 +34,37 @@ void BuddyAllocator::Free(void* pointer, size_t levelIndex)
 
 	while (true)
 	{
+		// change the m_FreeTable
+		m_FreeTable[getParentIndex] = 0;
+
+		// add the free slot to the parentLevel of freeSlots
+
+		// declare the two pointers
+		// set the slot of the released pointer to 0
+		PtrInt* releasedPointer = static_cast<PtrInt*>(pointer);
+		*releasedPointer = (PtrInt)(nullptr);
+
 		// the other buddy is free
 		if (m_FreeTable[getParentIndex] == 1)
 		{
-			// change the m_FreeTable
-			m_FreeTable[getParentIndex] = 0;
-
-			// add the free slot to the parentLevel of freeSlots
 			
-			// declare the two pointers
-			// set the slot of the released pointer to 0
-			PtrInt* releasedPointer = static_cast<PtrInt*>(pointer);
-			*releasedPointer = (PtrInt)(nullptr);
-
-			// -----change the chaining in the level of the releasedPointer
+			// -----reorganize the chaining on the level of the releasedPointer
 			// get the buddy pointer that is about to be released
-			PtrInt* buddyPointer = m_PointerToData + (GetSizeOfLevel(levelIndex) * buddyIndexOfThePointerInLevel);
+			void* buddyPointer = (m_PointerToData + (GetSizeOfLevel(levelIndex) * buddyIndexOfThePointerInLevel));
 			
 			// set the freeList on that level with value in the pointer
 			if (m_FreeLists[levelIndex] == buddyPointer)
 			{
-				m_FreeLists[levelIndex] = (PtrInt*)(*buddyPointer);
+				m_FreeLists[levelIndex] = static_cast<FreeListInformation*>(buddyPointer)->next;
 			}
 
 			else
 			{
+				((FreeListInformation*)(static_cast<FreeListInformation*>(buddyPointer)->previous))->next
+					= static_cast<FreeListInformation*>(buddyPointer)->next;
 
+				((FreeListInformation*)(static_cast<FreeListInformation*>(buddyPointer)->next))->previous
+					= static_cast<FreeListInformation*>(buddyPointer)->previous;
 			}
 		}
 
@@ -82,62 +87,73 @@ void* BuddyAllocator::Allocate(size_t blockSize)
 {
 	if (blockSize < LEAF_SIZE)
 	{
+		std::cout << "Size is less than the minimum..." << '\n';
 		return nullptr;
 	}
 
-	// assert some stuff...
+	// TODO:: assert some stuff...
 
 	size_t initialLevel;
 	
 	if (FastOperationsWithTwo::IsPowerOfTwo(blockSize))
 	{
-		initialLevel = FastLogarithm::log2_64(blockSize);
+		initialLevel = m_NumberOfLevels - FastLogarithm::log2_64(blockSize);
 	}
+
+	// get the minimum above the size
 	else
 	{
-		initialLevel = FastLogarithm::log2_64(blockSize) + 1;
+		initialLevel = m_NumberOfLevels - FastLogarithm::log2_64(blockSize) + 1;
 	}
 
 	size_t levelSize = GetSizeOfLevel(initialLevel);
 	int level = initialLevel;
 
-
+	// find a free block while there is a free block
 	while (true)
 	{
+		// if there is a free block in the current level, split it on two or if it is the initial level end the inspection
 		if (m_FreeLists[level] != nullptr)
 		{
-			PtrInt* freeSlot = (PtrInt*)*m_FreeLists[level];
+			// get the raw free location
+			void* rawFreeSlot = m_FreeLists[level];
 
-			m_FreeLists[level] = (PtrInt*)(*m_FreeLists[level]);
+			FreeListInformation* freeSlot = static_cast<FreeListInformation*>(m_FreeLists[level]);
 
+			// set the level pointer to the next free location
+			m_FreeLists[level] = freeSlot->next;
+
+			// change the m_FreeTable on the parent
 			{
-				size_t getUniqueIndexOfTheFreeSlot = GetUniqueIndex(freeSlot, level);
+				size_t uniqueIndexOfTheFreeSlot = GetUniqueIndex(freeSlot, level);
 
-				assert(m_FreeTable[getUniqueIndexOfTheFreeSlot] == 0);
+				size_t indexOfParent = GetParent(uniqueIndexOfTheFreeSlot);
 
-				if (m_FreeTable[getUniqueIndexOfTheFreeSlot] != 0)
-				{
-					std::cerr << "BuddyAllocator::Allocate() m_FreeTable[getUniqueIndexOfTheFreeSlot] != 0" << "\n";
-					return nullptr;
-				}
-
-				
+				m_FreeTable[indexOfParent] = 1 ^ m_FreeTable[indexOfParent];
 			}
 
-
+			// has acquired a free block on the expected spot, return the free location
 			if (level == initialLevel)
 			{
-				return freeSlot;
+				return rawFreeSlot;
 			}
 
-			//  has found a way to partition start going down again
+			//  has found a way to partition, start going down again
 			else
 			{
-				m_FreeLists[level + 1] = freeSlot;
-				*freeSlot = (PtrInt)(freeSlot + GetSizeOfLevel(level));
+				void* freeSlotNext = (static_cast<unsigned char*>(rawFreeSlot) + GetSizeOfLevel(level));
 
-				*(freeSlot + GetSizeOfLevel(level)) = (PtrInt)nullptr;
+				// assert the newly taken location has odd uniqueIndex
+				{
+					size_t nextSlotFreeIndex = GetUniqueIndex(freeSlotNext, level + 1);
+					assert(nextSlotFreeIndex % 2 == 1);
+				}
+			
+				// add the new free location to the level that is bellow the current
+				m_FreeLists[level + 1] = freeSlotNext;
 
+				// set the previous and next to the next free location
+				*static_cast<FreeListInformation*>(freeSlotNext) = { nullptr, nullptr };
 
 				++level;
 			}
