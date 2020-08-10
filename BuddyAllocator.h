@@ -2,6 +2,7 @@
 #define BUDDYALLOCATOR_H_GUARD
 
 #include "FastLogarithm.h"
+#include <bitset>
 
 /*
 	totalSize = (1 << numberOfLevels) * leafSize
@@ -16,27 +17,38 @@
 const uint64_t DEFAULT_BUDDY_ALLOCATOR_SIZE = 1 << 16;
 const uint64_t LEAF_SIZE = 1 << 7;
 
+struct FreeListInformation
+{
+	PtrInt* previous = nullptr;
+	PtrInt* next = nullptr;
+};
+
 struct BuddyAllocator
 {
-	static const int MAX_LEVELS = 25 ;
+	static const int MAX_LEVELS = 25;
+	static const int NUMBER_OF_BITSET_FOR_FREE_TABLE = DEFAULT_BUDDY_ALLOCATOR_SIZE / MAX_LEVELS / 2 / 8;
 
 public:
 	void Initialize();
 
-	//void Free(void* pointer, size_t sizeOfBlock);
+	void Free(void* pointer, size_t sizeOfBlock);
 	void Free(void* pointer);
 	void* Allocate(size_t blockSize);
 
 private:
 	PtrInt* m_FreeLists[MAX_LEVELS];
-	PtrInt* m_PointerToData;
+	std::bitset<NUMBER_OF_BITSET_FOR_FREE_TABLE> m_FreeTable;
 	size_t m_NumberOfLevels;
+
+	PtrInt* m_PointerToData;
 	
 	inline size_t GetTotalSize() 
 	{
 		return (1 << m_NumberOfLevels) * LEAF_SIZE;
 	}
 
+
+	// TotalSize / (2^levelIndex) = sizeOfEachBlockThere 
 	inline size_t GetSizeOfLevel(size_t n)
 	{
 		return GetTotalSize() / (1 << n);
@@ -55,9 +67,9 @@ private:
 	inline size_t IndexInLevel(size_t uniqueIndex)
 	{
 		size_t levelOfIndex = GetLevel(uniqueIndex);
-		size_t firstUniqueueIndexOnLevel = (1 << levelOfIndex) - 1;
+		size_t firstUniqueIndexOnLevel = (1 << levelOfIndex) - 1;
 
-		return uniqueIndex - firstUniqueueIndexOnLevel;
+		return uniqueIndex - firstUniqueIndexOnLevel;
 	}
 
 	inline size_t IndexInLevelOf(void* pointer, size_t levelIndex)
@@ -65,6 +77,42 @@ private:
 		PtrInt* getUnsignedCharPointer = static_cast<PtrInt*>(pointer);
 
 		return (getUnsignedCharPointer - m_PointerToData) / GetSizeOfLevel(levelIndex);
+	}
+
+	inline size_t GetUniqueIndex(void* pointer, size_t levelIndex)
+	{
+		/*
+			indexInLevelOfThePointer = uniqueIndex - firstUniqueIndexOnLevel
+			<=>
+			uniqueIndex = indexInLevelOfThePointer + firstUniqueIndexOnLevel
+		*/ 
+		
+		size_t firstUniqueIndexOnLevel = (1 << levelIndex) - 1;
+		size_t indexInLevelOfThePointer = IndexInLevelOf(pointer, levelIndex);
+	
+		return indexInLevelOfThePointer + firstUniqueIndexOnLevel;
+	}
+
+	inline size_t GetParent(size_t uniqueIndex)
+	{
+		if (uniqueIndex == 0)
+		{
+			return 0;
+		}
+
+		if (uniqueIndex % 2 == 0)
+		{
+			return (uniqueIndex - 1) / 2;
+		}
+
+		return uniqueIndex / 2;
+	}
+
+	inline size_t GetUniqueIndex(size_t localIndexInLevel, size_t levelIndex)
+	{
+		size_t firstUniqueIndexInLevel = (1 << levelIndex) - 1;
+		
+		return localIndexInLevel + firstUniqueIndexInLevel;
 	}
 
 	inline size_t GetBuddy(void* pointer, size_t levelIndex)

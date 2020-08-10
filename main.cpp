@@ -36,19 +36,16 @@ void ShutdownSystems()
 
 int main()
 {	
-	std::cout << FastOperationsWithTwo::IsPowerOfTwo(2);
+	BuddyAllocator buddyAllocator;
+	buddyAllocator.Initialize();
 
-	PtrInt* foo = new PtrInt(42);
+	//std::cout << FastOperationsWithTwo::IsPowerOfTwo(2);
 
-	PtrInt test = (PtrInt)(foo);
+	//PtrInt* foo = new PtrInt(42);
 
-	PtrInt* res = (PtrInt*)(test);
+	//PtrInt test = (PtrInt)(foo);
 
-	//int foo = 42;
-	//int* c = &foo;
-	//unsigned b = (unsigned)(c);
-
-
+	//PtrInt* res = (PtrInt*)(test);
 
 	return 0;
 
