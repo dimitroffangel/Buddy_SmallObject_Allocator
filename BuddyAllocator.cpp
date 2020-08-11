@@ -8,6 +8,7 @@ void BuddyAllocator::Initialize()
 	m_PointerToData = new unsigned char[DEFAULT_BUDDY_ALLOCATOR_SIZE];
 
 	m_FreeLists[0] = m_PointerToData;
+	*static_cast<FreeListInformation*>(m_FreeLists[0]) = { nullptr, nullptr };
 
 	for (size_t i = 1; i < MAX_LEVELS; ++i)
 	{
@@ -131,7 +132,22 @@ void BuddyAllocator::Free(void* pointer)
 		return;
 	}
 
+	size_t levelIndex = 0;
+	// find the pointer where is positioned
+	while (true)
+	{
+		if (levelIndex == MAX_LEVELS)
+		{
+			break;
+		}
 
+		if (m_FreeLists[levelIndex] == nullptr)
+		{
+			++levelIndex;
+		}
+
+
+	}
 }
 
 void* BuddyAllocator::Allocate(size_t blockSize)
@@ -180,7 +196,8 @@ void* BuddyAllocator::Allocate(size_t blockSize)
 
 				size_t indexOfParent = GetParent(uniqueIndexOfTheFreeSlot);
 
-				m_FreeTable[indexOfParent] = 1 ^ m_FreeTable[indexOfParent];
+				if(uniqueIndexOfTheFreeSlot != 0)
+					m_FreeTable[indexOfParent] = 1 ^ m_FreeTable[indexOfParent];
 			}
 
 			// has acquired a free block on the expected spot, return the free location
@@ -192,19 +209,20 @@ void* BuddyAllocator::Allocate(size_t blockSize)
 			//  has found a way to partition, start going down again
 			else
 			{
-				void* freeSlotNext = (static_cast<unsigned char*>(rawFreeSlot) + GetSizeOfLevel(level));
+				void* freeSlotNext = (static_cast<unsigned char*>(rawFreeSlot) + GetSizeOfLevel(level + 1));
 
 				// assert the newly taken location has odd uniqueIndex
 				{
 					size_t nextSlotFreeIndex = GetUniqueIndex(freeSlotNext, level + 1);
-					assert(nextSlotFreeIndex % 2 == 1);
+					assert(nextSlotFreeIndex % 2 == 0);
 				}
-			
+
 				// add the new free location to the level that is bellow the current
-				m_FreeLists[level + 1] = freeSlotNext;
+				m_FreeLists[level + 1] = rawFreeSlot;
 
 				// set the previous and next to the next free location
-				*static_cast<FreeListInformation*>(freeSlotNext) = { nullptr, nullptr };
+				*static_cast<FreeListInformation*>(rawFreeSlot) = { nullptr, static_cast<PtrInt*>(freeSlotNext) };
+				*static_cast<FreeListInformation*>(freeSlotNext) = { static_cast<PtrInt*>(rawFreeSlot), nullptr };
 
 				++level;
 			}

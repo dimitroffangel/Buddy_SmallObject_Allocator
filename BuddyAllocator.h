@@ -25,8 +25,8 @@ struct FreeListInformation
 
 struct BuddyAllocator
 {
-	static const int MAX_LEVELS = 25;
-	static const int NUMBER_OF_BITSET_FOR_FREE_TABLE = DEFAULT_BUDDY_ALLOCATOR_SIZE / MAX_LEVELS / 2 / 8;
+	static const int MAX_LEVELS = 16;
+	static const int NUMBER_OF_BITSET_FOR_FREE_TABLE = DEFAULT_BUDDY_ALLOCATOR_SIZE / LEAF_SIZE;
 
 public:
 	void Initialize();
@@ -38,13 +38,14 @@ public:
 private:
 	void* m_FreeLists[MAX_LEVELS];
 	std::bitset<NUMBER_OF_BITSET_FOR_FREE_TABLE> m_FreeTable;
-	size_t m_NumberOfLevels;
+	size_t m_NumberOfLevels = MAX_LEVELS;
 
 	unsigned char* m_PointerToData;
 	
 	inline size_t GetTotalSize() 
 	{
-		return (1 << m_NumberOfLevels) * LEAF_SIZE;
+		//return (1 << m_NumberOfLevels) * LEAF_SIZE;
+		return (1 << m_NumberOfLevels);
 	}
 
 
