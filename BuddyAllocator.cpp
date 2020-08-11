@@ -15,39 +15,45 @@ void BuddyAllocator::Initialize()
 	}
 }
 
-void BuddyAllocator::Free(void* pointer, size_t levelIndex)
+void BuddyAllocator::Free(void* pointerToFree, size_t levelIndex)
 {
-	// assert that the pointer is in the range
+	// TODO::: assert that the pointer is in the range
 
-	if (pointer == nullptr)
+	if (pointerToFree == nullptr)
 	{
 		return;
 	}
 
-	size_t uniqueIndexOfThePointer = GetUniqueIndex(pointer, levelIndex);
-	size_t buddyIndexOfThePointerInLevel = GetBuddy(pointer, levelIndex);
+	// TODO:: that the pointerToFree and level are valid
+
+	if (levelIndex == 0)
+	{
+		m_FreeLists[0] = m_PointerToData;
+		return;
+	}
+
+	size_t uniqueIndexOfThePointer = GetUniqueIndex(pointerToFree, levelIndex);
+	size_t buddyIndexOfThePointerInLevel = GetBuddy(pointerToFree, levelIndex);
 	size_t buddyIndexOfThePointer = GetUniqueIndex(buddyIndexOfThePointerInLevel, levelIndex);
 	size_t getParentIndex = GetParent(uniqueIndexOfThePointer);
 	size_t parentLevel = levelIndex - 1;
 	// the pointer may be to a location, which is split, not used
 
-
 	while (true)
 	{
-		// change the m_FreeTable
-		m_FreeTable[getParentIndex] = 0;
-
-		// add the free slot to the parentLevel of freeSlots
-
-		// declare the two pointers
-		// set the slot of the released pointer to 0
-		PtrInt* releasedPointer = static_cast<PtrInt*>(pointer);
-		*releasedPointer = (PtrInt)(nullptr);
-
 		// the other buddy is free
 		if (m_FreeTable[getParentIndex] == 1)
 		{
-			
+			// change the m_FreeTable
+			m_FreeTable[getParentIndex] = 0;
+
+			// add the free slot to the parentLevel of freeSlots
+
+			// declare the two pointers
+			// set the slot of the released pointer to 0
+			PtrInt* releasedPointer = static_cast<PtrInt*>(pointerToFree);
+			*releasedPointer = (PtrInt)(nullptr);
+
 			// -----reorganize the chaining on the level of the releasedPointer
 			// get the buddy pointer that is about to be released
 			void* buddyPointer = (m_PointerToData + (GetSizeOfLevel(levelIndex) * buddyIndexOfThePointerInLevel));
@@ -66,8 +72,53 @@ void BuddyAllocator::Free(void* pointer, size_t levelIndex)
 				((FreeListInformation*)(static_cast<FreeListInformation*>(buddyPointer)->next))->previous
 					= static_cast<FreeListInformation*>(buddyPointer)->previous;
 			}
+
+			// get the parent pointer and do the same stuff
+			
+			levelIndex = levelIndex - 1;
+			// if has reached top, abort the releasing of blocks
+			if (levelIndex == 0)
+			{
+				m_FreeLists[0] = m_PointerToData;
+				return;
+			}
+
+			// find the one with odd uniqueIndex
+			// NOTE:::->   levelIndex > 0 => has a buddy
+
+			if (uniqueIndexOfThePointer % 2 == 0)
+			{
+				std::swap(pointerToFree, buddyPointer);
+			}
+
+
+			// the parent address starts with the address of the current pointer
+			uniqueIndexOfThePointer = GetUniqueIndex(pointerToFree, levelIndex);
+
+
+			buddyIndexOfThePointerInLevel = GetBuddy(pointerToFree, levelIndex);
+			buddyIndexOfThePointer = GetUniqueIndex(buddyIndexOfThePointerInLevel, levelIndex);
+			getParentIndex = GetParent(uniqueIndexOfThePointer);
+			parentLevel = levelIndex - 1;
 		}
 
+		else
+		{
+			// change the m_FreeTable
+			m_FreeTable[getParentIndex] = 1;
+
+			// declare the two pointers
+			// set the slot of the released pointer to 0
+			PtrInt* releasedPointer = static_cast<PtrInt*>(pointerToFree);
+			*releasedPointer = (PtrInt)(nullptr);
+
+			static_cast<FreeListInformation*>(m_FreeLists[levelIndex])->previous = releasedPointer;
+
+			static_cast<FreeListInformation*>(pointerToFree)->next = static_cast<PtrInt*>(m_FreeLists[levelIndex]);
+			static_cast<FreeListInformation*>(pointerToFree)->previous = nullptr;
+
+			m_FreeLists[levelIndex] = pointerToFree;
+		}
 	}
 }
 
