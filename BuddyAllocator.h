@@ -38,6 +38,7 @@ public:
 private:
 	void* m_FreeLists[MAX_LEVELS];
 	std::bitset<NUMBER_OF_BITSET_FOR_FREE_TABLE> m_FreeTable;
+	std::bitset<NUMBER_OF_BITSET_FOR_FREE_TABLE> m_SplitTable;
 	size_t m_NumberOfLevels = MAX_LEVELS;
 
 	unsigned char* m_PointerToData;

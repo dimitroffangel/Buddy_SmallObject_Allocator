@@ -40,6 +40,21 @@ void BuddyAllocator::Free(void* pointerToFree, size_t levelIndex)
 	size_t parentLevel = levelIndex - 1;
 	// the pointer may be to a location, which is split, not used
 
+	
+	// check if the level is right
+	if (levelIndex >= MAX_LEVELS)
+	{
+		std::cerr << "BuddyAllocator::Free(void* pointerToFree, size_t levelIndex) levelIndex >= MAX_LEVELS" << '\n';
+		return;
+	}
+
+	// check if the level points 
+	if (m_SplitTable[levelIndex] == 1)
+	{
+		std::cerr << "BuddyAllocator::Free(void* pointerToFree, size_t levelIndex) m_SplitTable[levelIndex] = 1" << '\n';
+		return;
+	}
+
 	while (true)
 	{
 		// the other buddy is free
@@ -74,9 +89,14 @@ void BuddyAllocator::Free(void* pointerToFree, size_t levelIndex)
 					= static_cast<FreeListInformation*>(buddyPointer)->previous;
 			}
 
-			// get the parent pointer and do the same stuff
-			
 			levelIndex = levelIndex - 1;
+
+			// set the splitTable value of the parent block to 0
+			{
+				assert(m_SplitTable[getParentIndex] == 1);
+				m_SplitTable[getParentIndex] = 0;
+			}
+
 			// if has reached top, abort the releasing of blocks
 			if (levelIndex == 0)
 			{
@@ -92,10 +112,8 @@ void BuddyAllocator::Free(void* pointerToFree, size_t levelIndex)
 				std::swap(pointerToFree, buddyPointer);
 			}
 
-
 			// the parent address starts with the address of the current pointer
 			uniqueIndexOfThePointer = GetUniqueIndex(pointerToFree, levelIndex);
-
 
 			buddyIndexOfThePointerInLevel = GetBuddy(pointerToFree, levelIndex);
 			buddyIndexOfThePointer = GetUniqueIndex(buddyIndexOfThePointerInLevel, levelIndex);
@@ -219,6 +237,14 @@ void* BuddyAllocator::Allocate(size_t blockSize)
 			//  has found a way to partition, start going down again
 			else
 			{
+				// change the split table for the newly divided block
+				{
+					size_t uniqueIndexOfTheFreeSlot = GetUniqueIndex(freeSlot, level);
+
+					assert(m_SplitTable[uniqueIndexOfTheFreeSlot] == 0);
+					m_SplitTable[uniqueIndexOfTheFreeSlot] = 1;
+				}
+
 				void* freeSlotNext = (static_cast<unsigned char*>(rawFreeSlot) + GetSizeOfLevel(level + 1));
 
 				// assert the newly taken location has odd uniqueIndex
