@@ -108,17 +108,27 @@ void BuddyAllocator::Free(void* pointerToFree, size_t levelIndex)
 			// change the m_FreeTable
 			m_FreeTable[getParentIndex] = 1;
 
-			// declare the two pointers
-			// set the slot of the released pointer to 0
-			PtrInt* releasedPointer = static_cast<PtrInt*>(pointerToFree);
-			*releasedPointer = (PtrInt)(nullptr);
+			// set the head of the linkedList to the pointerToFree location
+			if (m_FreeLists[levelIndex] == nullptr)
+			{
+				m_FreeLists[levelIndex] = pointerToFree;
 
-			static_cast<FreeListInformation*>(m_FreeLists[levelIndex])->previous = releasedPointer;
+				static_cast<FreeListInformation*>(pointerToFree)->next = nullptr;
+				static_cast<FreeListInformation*>(pointerToFree)->previous = nullptr;
+			}
 
-			static_cast<FreeListInformation*>(pointerToFree)->next = static_cast<PtrInt*>(m_FreeLists[levelIndex]);
-			static_cast<FreeListInformation*>(pointerToFree)->previous = nullptr;
+			else
+			{
+				static_cast<FreeListInformation*>(m_FreeLists[levelIndex])->previous = static_cast<PtrInt*>(pointerToFree);
+
+				static_cast<FreeListInformation*>(pointerToFree)->next = static_cast<PtrInt*>(m_FreeLists[levelIndex]);
+				static_cast<FreeListInformation*>(pointerToFree)->previous = nullptr;
+			}
 
 			m_FreeLists[levelIndex] = pointerToFree;
+
+			// the other buddy is not free, so there cannot be going forward
+			return;
 		}
 	}
 }

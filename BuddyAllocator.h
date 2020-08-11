@@ -31,7 +31,7 @@ struct BuddyAllocator
 public:
 	void Initialize();
 
-	void Free(void* pointer, size_t sizeOfBlock);
+	void Free(void* pointer, size_t levelIndex);
 	void Free(void* pointer);
 	void* Allocate(size_t blockSize);
 
