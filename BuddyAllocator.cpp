@@ -3,17 +3,102 @@
 #include <iostream>
 #include <assert.h>
 
+void BuddyAllocator::SimulateAllocationForLeaves_ForFreeList(size_t numberOfAllocationsOnLeafsNeeded)
+{
+	int level = MAX_LEVELS - FastLogarithm::Log2_64(LEAF_SIZE);
+
+	while (numberOfAllocationsOnLeafsNeeded > 0 && level >= 0)
+	{
+		for (size_t i = 0; i < numberOfAllocationsOnLeafsNeeded; i += 2)
+		{
+			size_t levleSize = GetSizeOfLevel(level);
+			size_t uniqueIndex = GetUniqueIndex(m_PointerToData + (i * GetSizeOfLevel(level)), level);
+			size_t parentIndex = GetParent(uniqueIndex);
+
+			if (i % 2 == 0 && i + 1 < numberOfAllocationsOnLeafsNeeded)
+			{
+				// the buddy of the leaf is taken as well
+				m_FreeTable[parentIndex] = 0;
+				m_SplitTable[parentIndex] = 1;
+			}
+
+			else
+			{
+				// the buddy is free
+				m_SplitTable[parentIndex] = 1;
+				m_FreeTable[parentIndex] = 1;
+			}
+		}
+
+		numberOfAllocationsOnLeafsNeeded = numberOfAllocationsOnLeafsNeeded / 2 + !(numberOfAllocationsOnLeafsNeeded % 2 == 0);
+		
+		if (numberOfAllocationsOnLeafsNeeded % 2 != 0 && level != 0)
+		{
+			// there is a freeSlot there
+			*(PtrInt*)(m_PointerToData + sizeof(PtrInt) * level) =
+				(PtrInt)(m_PointerToData + (GetSizeOfLevel(level) * numberOfAllocationsOnLeafsNeeded));
+
+			PtrInt* fooProdigy = (PtrInt*)(m_PointerToData + (sizeof(PtrInt) * level));
+			FreeListInformation* fooProdigyInfo = (FreeListInformation*)(*fooProdigy);
+
+			*((FreeListInformation*)(m_PointerToData + (GetSizeOfLevel(level) * numberOfAllocationsOnLeafsNeeded))) = { nullptr, nullptr };
+
+
+			int a = 42;
+ 		}
+			
+		--level;
+	}
+}
+
 void BuddyAllocator::Initialize()
 {
 	m_PointerToData = new unsigned char[DEFAULT_BUDDY_ALLOCATOR_SIZE];
 
-	m_FreeLists[0] = m_PointerToData;
-	*static_cast<FreeListInformation*>(m_FreeLists[0]) = { nullptr, nullptr };
+	//m_FreeLists[0] = m_PointerToData;
+	//*static_cast<FreeListInformation*>(m_FreeLists[0]) = { nullptr, nullptr };
+
+	//for (size_t i = 1; i < MAX_LEVELS; ++i)
+	//{
+	//	m_FreeLists[i] = nullptr;
+	//}
+	//{
+	//	void* startOfTheListInformationPointers = Allocate(LEAF_SIZE);
+
+	//	if (startOfTheListInformationPointers == nullptr)
+	//	{
+	//		std::cerr << "BuddyAllocator::Initialize startOfTheListInformationPointers == nullptr" << '\n';
+	//		return;
+	//	}
+
+	//	*static_cast<PtrInt*>(startOfTheListInformationPointers) = (PtrInt)(nullptr);
+	//}
+	
+	{
+		*((PtrInt*)(m_PointerToData)) = (PtrInt)(m_PointerToData);
+
+		FreeListInformation* foo = (FreeListInformation*)(m_PointerToData);
+		*foo = { nullptr, nullptr };
+
+
+		PtrInt* foo2 = (PtrInt*)(m_PointerToData);
+		int a = 42;
+	}
+
+	size_t size = sizeof(PtrInt);
 
 	for (size_t i = 1; i < MAX_LEVELS; ++i)
 	{
-		m_FreeLists[i] = nullptr;
+		*((PtrInt*)(m_PointerToData + sizeof(PtrInt) * i)) = 0;
+
+		size += sizeof(PtrInt);
 	}
+
+	size_t numberOfAllocationsOnLeafsNeeded = size / LEAF_SIZE + !(size % LEAF_SIZE == 0);
+
+	SimulateAllocationForLeaves_ForFreeList(numberOfAllocationsOnLeafsNeeded);
+	
+	int test = 42;
 }
 
 void BuddyAllocator::Free(void* pointerToFree, size_t levelIndex)
@@ -29,7 +114,10 @@ void BuddyAllocator::Free(void* pointerToFree, size_t levelIndex)
 
 	if (levelIndex == 0)
 	{
-		m_FreeLists[0] = m_PointerToData;
+		*((PtrInt*)(m_PointerToData)) = (PtrInt)(m_PointerToData);
+		//*(FreeListInformation*)(m_PointerToData) = { nullptr, nullptr };
+
+		//m_FreeLists[0] = m_PointerToData;
 		return;
 	}
 
@@ -49,9 +137,9 @@ void BuddyAllocator::Free(void* pointerToFree, size_t levelIndex)
 	}
 
 	// check if the level points 
-	if (m_SplitTable[levelIndex] == 1)
+	if (uniqueIndexOfThePointer < NUMBER_OF_BITSET_FOR_FREE_TABLE && m_SplitTable[uniqueIndexOfThePointer] == 1)
 	{
-		std::cerr << "BuddyAllocator::Free(void* pointerToFree, size_t levelIndex) m_SplitTable[levelIndex] = 1" << '\n';
+		std::cerr << "BuddyAllocator::Free(void* pointerToFree, size_t levelIndex) m_SplitTable[uniqueIndexOfThePointer] = 1" << '\n';
 		return;
 	}
 
@@ -75,9 +163,13 @@ void BuddyAllocator::Free(void* pointerToFree, size_t levelIndex)
 			void* buddyPointer = (m_PointerToData + (GetSizeOfLevel(levelIndex) * buddyIndexOfThePointerInLevel));
 			
 			// set the freeList on that level with value in the pointer
-			if (m_FreeLists[levelIndex] == buddyPointer)
+			if (*((PtrInt*)(m_PointerToData + (sizeof(PtrInt) * levelIndex))) == (PtrInt)(buddyPointer))
 			{
-				m_FreeLists[levelIndex] = static_cast<FreeListInformation*>(buddyPointer)->next;
+				FreeListInformation* freeSlot = static_cast<FreeListInformation*>(buddyPointer);
+
+				*((PtrInt*)(m_PointerToData + (sizeof(PtrInt) * levelIndex))) = (PtrInt)(freeSlot->next);
+
+				//m_FreeLists[levelIndex] = static_cast<FreeListInformation*>(buddyPointer)->next;
 			}
 
 			else
@@ -100,7 +192,10 @@ void BuddyAllocator::Free(void* pointerToFree, size_t levelIndex)
 			// if has reached top, abort the releasing of blocks
 			if (levelIndex == 0)
 			{
-				m_FreeLists[0] = m_PointerToData;
+				*((PtrInt*)(m_PointerToData)) = (PtrInt)(m_PointerToData);
+
+				//*(FreeListInformation*)(m_PointerToData) = { nullptr, nullptr };
+				//m_FreeLists[0] = m_PointerToData;
 				return;
 			}
 
@@ -127,9 +222,9 @@ void BuddyAllocator::Free(void* pointerToFree, size_t levelIndex)
 			m_FreeTable[getParentIndex] = 1;
 
 			// set the head of the linkedList to the pointerToFree location
-			if (m_FreeLists[levelIndex] == nullptr)
+			if (*((PtrInt*)(m_PointerToData + (sizeof(PtrInt) * levelIndex))) == 0)
 			{
-				m_FreeLists[levelIndex] = pointerToFree;
+				//m_FreeLists[levelIndex] = pointerToFree;
 
 				static_cast<FreeListInformation*>(pointerToFree)->next = nullptr;
 				static_cast<FreeListInformation*>(pointerToFree)->previous = nullptr;
@@ -137,13 +232,15 @@ void BuddyAllocator::Free(void* pointerToFree, size_t levelIndex)
 
 			else
 			{
-				static_cast<FreeListInformation*>(m_FreeLists[levelIndex])->previous = static_cast<PtrInt*>(pointerToFree);
+				((FreeListInformation*)(*((PtrInt*)(m_PointerToData + (sizeof(PtrInt) * levelIndex)))))->previous =
+					static_cast<PtrInt*>(pointerToFree);
 
-				static_cast<FreeListInformation*>(pointerToFree)->next = static_cast<PtrInt*>(m_FreeLists[levelIndex]);
+				static_cast<FreeListInformation*>(pointerToFree)->next = (PtrInt*)(*((PtrInt*)(m_PointerToData + sizeof(PtrInt) * levelIndex)));
 				static_cast<FreeListInformation*>(pointerToFree)->previous = nullptr;
 			}
 
-			m_FreeLists[levelIndex] = pointerToFree;
+			*((PtrInt*)(m_PointerToData + sizeof(PtrInt) * levelIndex)) = (PtrInt)(pointerToFree);
+			//m_FreeLists[levelIndex] = pointerToFree;
 
 			// the other buddy is not free, so there cannot be going forward
 			return;
@@ -153,29 +250,29 @@ void BuddyAllocator::Free(void* pointerToFree, size_t levelIndex)
 
 void BuddyAllocator::Free(void* pointer)
 {
-	// assert that the pointer is in the range
+	//// assert that the pointer is in the range
 
-	if (pointer == nullptr)
-	{
-		return;
-	}
+	//if (pointer == nullptr)
+	//{
+	//	return;
+	//}
 
-	size_t levelIndex = 0;
-	// find the pointer where is positioned
-	while (true)
-	{
-		if (levelIndex == MAX_LEVELS)
-		{
-			break;
-		}
+	//size_t levelIndex = 0;
+	//// find the pointer where is positioned
+	//while (true)
+	//{
+	//	if (levelIndex == MAX_LEVELS)
+	//	{
+	//		break;
+	//	}
 
-		if (m_FreeLists[levelIndex] == nullptr)
-		{
-			++levelIndex;
-		}
+	//	if (m_FreeLists[levelIndex] == nullptr)
+	//	{
+	//		++levelIndex;
+	//	}
 
 
-	}
+	//}
 }
 
 void* BuddyAllocator::Allocate(size_t blockSize)
@@ -188,18 +285,7 @@ void* BuddyAllocator::Allocate(size_t blockSize)
 
 	// TODO:: assert some stuff...
 
-	size_t initialLevel;
-	
-	if (FastOperationsWithTwo::IsPowerOfTwo(blockSize))
-	{
-		initialLevel = m_NumberOfLevels - FastLogarithm::log2_64(blockSize);
-	}
-
-	// get the minimum above the size
-	else
-	{
-		initialLevel = m_NumberOfLevels - FastLogarithm::log2_64(blockSize) + 1;
-	}
+	size_t initialLevel = m_NumberOfLevels - FastLogarithm::Log2_64(blockSize) + !FastOperationsWithTwo::IsPowerOfTwo(blockSize);
 
 	size_t levelSize = GetSizeOfLevel(initialLevel);
 	int level = initialLevel;
@@ -208,26 +294,31 @@ void* BuddyAllocator::Allocate(size_t blockSize)
 	while (true)
 	{
 		// if there is a free block in the current level, split it on two or if it is the initial level end the inspection
-		if (m_FreeLists[level] != nullptr)
+		if (*((PtrInt*)(m_PointerToData + (sizeof(PtrInt) * level))) != 0)
 		{
 			// get the raw free location
-			void* rawFreeSlot = m_FreeLists[level];
+			void* rawFreeSlot = (void*)(*((PtrInt*)(m_PointerToData + (sizeof(PtrInt) * level))));
 
-			FreeListInformation* freeSlot = static_cast<FreeListInformation*>(m_FreeLists[level]);
-
-			// set the level pointer to the next free location
-			m_FreeLists[level] = freeSlot->next;
+			FreeListInformation* freeSlot = static_cast<FreeListInformation*>(rawFreeSlot);
 
 			// change the m_FreeTable on the parent
 			{
 				size_t uniqueIndexOfTheFreeSlot = GetUniqueIndex(freeSlot, level);
 
-				size_t indexOfParent = GetParent(uniqueIndexOfTheFreeSlot);
+				if (uniqueIndexOfTheFreeSlot != 0)
+				{
+					size_t indexOfParent = GetParent(uniqueIndexOfTheFreeSlot);
 
-				if(uniqueIndexOfTheFreeSlot != 0)
 					m_FreeTable[indexOfParent] = 1 ^ m_FreeTable[indexOfParent];
+				}
 			}
 
+			// set the level pointer to the next free location
+			{
+				PtrInt* levelPointer = (PtrInt*)(m_PointerToData + (sizeof(PtrInt) * level));
+				*(levelPointer) = (PtrInt)(freeSlot->next);
+				PtrInt res = PtrInt(freeSlot->next);
+			}
 			// has acquired a free block on the expected spot, return the free location
 			if (level == initialLevel)
 			{
@@ -254,8 +345,8 @@ void* BuddyAllocator::Allocate(size_t blockSize)
 				}
 
 				// add the new free location to the level that is bellow the current
-				m_FreeLists[level + 1] = rawFreeSlot;
-
+				*((PtrInt*)(m_PointerToData + sizeof(PtrInt) * (level + 1))) = (PtrInt)(rawFreeSlot);
+				
 				// set the previous and next to the next free location
 				*static_cast<FreeListInformation*>(rawFreeSlot) = { nullptr, static_cast<PtrInt*>(freeSlotNext) };
 				*static_cast<FreeListInformation*>(freeSlotNext) = { static_cast<PtrInt*>(rawFreeSlot), nullptr };

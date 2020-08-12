@@ -56,6 +56,24 @@ void ShutdownSystems()
 
 int main()
 {	
+	{
+		PtrInt* a = new PtrInt(42);
+
+		PtrInt* b = new PtrInt;
+
+		*b = (PtrInt)a;
+
+		PtrInt* c = new PtrInt;
+
+		*c = (PtrInt)(&a);
+
+		PtrInt* f = (PtrInt*)(*c);
+		PtrInt* h = (PtrInt*)(*b);
+
+		int d = 42;
+	}
+
+
 	SmallObjectAllocator::Initialize();
 
 	const int blocks = 4;
@@ -71,7 +89,7 @@ int main()
 	std::vector<EpicFoo*> foos;
 	foos.reserve(size);
 
-	for (size_t i = 0; i < 512; i++)
+	for (size_t i = 0; i < 511; i++)
 	{
 		//void* rawPointer = smallObject.operator new(sizeOfFoo)
 		void* rawPointer = buddyAllocator.Allocate(sizeof(EpicFoo));
@@ -83,7 +101,7 @@ int main()
 	//	foos.push_back(result1);
 	}
 
-	for (size_t i = 0; i < 512; i++)
+	for (size_t i = 0; i < 511; i++)
 	{
 		//delete foos[i];
 		

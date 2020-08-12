@@ -28,6 +28,10 @@ struct BuddyAllocator
 	static const int MAX_LEVELS = 16;
 	static const int NUMBER_OF_BITSET_FOR_FREE_TABLE = DEFAULT_BUDDY_ALLOCATOR_SIZE / LEAF_SIZE;
 
+private:
+	void SimulateAllocationForLeaves_ForFreeList(size_t numberOfAllocationsOnLeafsNeeded);
+	void SimulateAllocationForLeaves_ForBitsetFreeTable(size_t numberOfAllocationsNeeded);
+
 public:
 	void Initialize();
 
@@ -36,7 +40,7 @@ public:
 	void* Allocate(size_t blockSize);
 
 private:
-	void* m_FreeLists[MAX_LEVELS];
+	//void* m_FreeLists[MAX_LEVELS];
 	std::bitset<NUMBER_OF_BITSET_FOR_FREE_TABLE> m_FreeTable;
 	std::bitset<NUMBER_OF_BITSET_FOR_FREE_TABLE> m_SplitTable;
 	size_t m_NumberOfLevels = MAX_LEVELS;
@@ -63,7 +67,7 @@ private:
 			return 0;
 		}
 
-		return FastLogarithm::log2_64(uniqueIndex + 1);
+		return FastLogarithm::Log2_64(uniqueIndex + 1);
 	}
 
 	inline size_t IndexInLevel(size_t uniqueIndex)
@@ -78,6 +82,8 @@ private:
 	{
 		unsigned char* getUnsignedCharPointer = static_cast<unsigned char*>(pointer);
 
+		size_t res = getUnsignedCharPointer - m_PointerToData;
+
 		return (getUnsignedCharPointer - m_PointerToData) / GetSizeOfLevel(levelIndex);
 	}
 
@@ -90,6 +96,7 @@ private:
 		*/ 
 		
 		size_t firstUniqueIndexOnLevel = (1 << levelIndex) - 1;
+	
 		size_t indexInLevelOfThePointer = IndexInLevelOf(pointer, levelIndex);
 	
 		return indexInLevelOfThePointer + firstUniqueIndexOnLevel;

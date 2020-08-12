@@ -5,7 +5,7 @@ bool FastOperationsWithTwo::IsPowerOfTwo(PtrInt x)
 	return (x & (x - 1)) == 0;
 }
 
-int FastLogarithm::log2_64(std::uint64_t value)
+int FastLogarithm::Log2_64(std::uint64_t value)
 {
 	value |= value >> 1;
 	value |= value >> 2;
@@ -16,7 +16,7 @@ int FastLogarithm::log2_64(std::uint64_t value)
 	return tab64[((uint64_t)((value - (value >> 1)) * 0x07EDD5E59A4E28C2)) >> 58];
 }
 
-int FastLogarithm::log2_32(uint32_t value)
+int FastLogarithm::Log2_32(uint32_t value)
 {
 	value |= value >> 1;
 	value |= value >> 2;

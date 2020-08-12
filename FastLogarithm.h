@@ -26,7 +26,7 @@ namespace FastLogarithm
 		44, 24, 15,  8, 23,  7,  6,  5
 	};
 
-	int log2_64(std::uint64_t value);
+	int Log2_64(std::uint64_t value);
 
 	const int tab32[32] = 
 	{
@@ -36,5 +36,5 @@ namespace FastLogarithm
 		19, 27, 23,  6, 26,  5,  4, 31 
 	};
 
-	int log2_32(uint32_t value);
+	int Log2_32(uint32_t value);
 }
