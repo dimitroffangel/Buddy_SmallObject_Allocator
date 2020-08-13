@@ -15,23 +15,24 @@ void BuddyAllocator::SimulateAllocationForLeaves_ForFreeList(size_t numberOfAllo
 			size_t uniqueIndex = GetUniqueIndex(m_PointerToData + (i * GetSizeOfLevel(level)), level);
 			size_t parentIndex = GetParent(uniqueIndex);
 
+			SetBitToOne_SplitTable(parentIndex);
+			//m_SplitTable[parentIndex] = 1;
+
 			if (i % 2 == 0 && i + 1 < numberOfAllocationsOnLeafsNeeded)
 			{
 				// the buddy of the leaf is taken as well
-				m_FreeTable[parentIndex] = 0;
-				m_SplitTable[parentIndex] = 1;
+				SetBitToZero_FreeTable(parentIndex);
+				//m_FreeTable[parentIndex] = 0;
 			}
 
 			else
 			{
 				// the buddy is free
-				m_SplitTable[parentIndex] = 1;
-				m_FreeTable[parentIndex] = 1;
+				SetBitToOne_FreeTable(parentIndex);
+				//m_FreeTable[parentIndex] = 1;
 			}
 		}
 
-		numberOfAllocationsOnLeafsNeeded = numberOfAllocationsOnLeafsNeeded / 2 + !(numberOfAllocationsOnLeafsNeeded % 2 == 0);
-		
 		if (numberOfAllocationsOnLeafsNeeded % 2 != 0 && level != 0)
 		{
 			// there is a freeSlot there
@@ -46,9 +47,132 @@ void BuddyAllocator::SimulateAllocationForLeaves_ForFreeList(size_t numberOfAllo
 
 			int a = 42;
  		}
+
+		numberOfAllocationsOnLeafsNeeded = numberOfAllocationsOnLeafsNeeded / 2 + !(numberOfAllocationsOnLeafsNeeded % 2 == 0);
 			
 		--level;
 	}
+}
+
+void BuddyAllocator::SetBitToOne_FreeTable(const size_t parentIndex)
+{
+	const int highestLevel = MAX_LEVELS;
+
+	void* address = (m_PointerToData + ((highestLevel) * sizeof(PtrInt)) + sizeof(PtrInt) * ((parentIndex / sizeof(PtrInt)) / 8));
+
+	PtrInt tref = (PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)));
+	
+	bool res1 = (*static_cast<PtrInt*>(address)) & (PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)));
+
+	(*static_cast<PtrInt*>(address)) |= (PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)));
+
+	bool res2 = (*static_cast<PtrInt*>(address)) & (PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)));
+
+	bool res = GetBitFromFreeTable(parentIndex);
+}
+
+void BuddyAllocator::SetBitToZero_FreeTable(const size_t parentIndex)
+{
+	const int highestLevel = MAX_LEVELS;
+
+	void* address = (m_PointerToData + ((highestLevel) * sizeof(PtrInt)) + sizeof(PtrInt) * ((parentIndex / sizeof(PtrInt)) / 8));
+
+	bool res1 = (*static_cast<PtrInt*>(address)) & (PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)));
+
+	(*static_cast<PtrInt*>(address)) &= ~(PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)));
+
+	bool res2 = (*static_cast<PtrInt*>(address)) & (PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)));
+
+	bool res = GetBitFromFreeTable(parentIndex);
+}
+
+inline bool BuddyAllocator::GetBitFromFreeTable(const size_t parentIndex)
+{
+	const int highestLevel = MAX_LEVELS;
+
+	void* address = (m_PointerToData + ((highestLevel) * sizeof(PtrInt)) + sizeof(PtrInt) * ((parentIndex / sizeof(PtrInt)) / 8));
+
+	bool res = (*static_cast<PtrInt*>(address)) & (PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)));
+
+	return (*static_cast<PtrInt*>(address)) & (PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)));
+}
+
+inline void BuddyAllocator::XOR_Bit_FreeTable(const size_t parentIndex, const bool XOR_Argument)
+{
+	bool result = GetBitFromFreeTable(parentIndex) ^ XOR_Argument;
+	
+	if (result == 0)
+	{
+		SetBitToZero_FreeTable(parentIndex);
+	}
+
+	else
+	{
+		SetBitToOne_FreeTable(parentIndex);
+	}
+
+	bool res = GetBitFromFreeTable(parentIndex);
+}
+
+void BuddyAllocator::SetBitToOne_SplitTable(const size_t parentIndex)
+{
+	const int highestLevel = MAX_LEVELS;
+
+	void* address = (m_PointerToData + ((highestLevel) * sizeof(PtrInt)) + (NUMBER_OF_BITSET_FOR_FREE_TABLE / 8) +
+		(sizeof(PtrInt) * ((parentIndex / sizeof(PtrInt)) / 8)));
+
+	bool res1 = (*static_cast<PtrInt*>(address)) & (PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)));
+
+	(*static_cast<PtrInt*>(address)) |= (PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)));
+
+	bool res2 = (*static_cast<PtrInt*>(address)) & (PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)));
+
+	bool res = GetBitFromSplitTable(parentIndex);
+}
+
+void BuddyAllocator::SetBitToZero_SplitTable(const size_t parentIndex)
+{
+	const int highestLevel = MAX_LEVELS;
+
+	void* address = (m_PointerToData + ((highestLevel) * sizeof(PtrInt)) + (NUMBER_OF_BITSET_FOR_FREE_TABLE / 8) +
+		(sizeof(PtrInt) * ((parentIndex / sizeof(PtrInt)) / 8)));
+
+	bool res1 = (*static_cast<PtrInt*>(address)) & (PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)));
+
+	(*static_cast<PtrInt*>(address)) &= ~(PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)));
+
+	bool res2 = (*static_cast<PtrInt*>(address)) & (PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)));
+
+	bool res = GetBitFromSplitTable(parentIndex);
+}
+
+inline bool BuddyAllocator::GetBitFromSplitTable(const size_t parentIndex)
+{
+	const int highestLevel = MAX_LEVELS;
+
+	void* address = (m_PointerToData + ((highestLevel) * sizeof(PtrInt)) + (NUMBER_OF_BITSET_FOR_FREE_TABLE / 8) +
+		(sizeof(PtrInt) * ((parentIndex / sizeof(PtrInt)) / 8)));
+
+	bool res = (*static_cast<PtrInt*>(address)) & (PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)));
+
+	return (*static_cast<PtrInt*>(address)) & (PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)));
+}
+
+inline void BuddyAllocator::XOR_Bit_SplitTable(const size_t parentIndex, const bool XOR_Argument)
+{
+	bool result = GetBitFromSplitTable(parentIndex) ^ XOR_Argument;
+
+	if (result == 0)
+	{
+		SetBitToZero_SplitTable(parentIndex);
+	}
+
+	else
+	{
+		SetBitToOne_SplitTable(parentIndex);
+	}
+
+	bool res = GetBitFromSplitTable(parentIndex);
 }
 
 void BuddyAllocator::Initialize()
@@ -79,10 +203,6 @@ void BuddyAllocator::Initialize()
 
 		FreeListInformation* foo = (FreeListInformation*)(m_PointerToData);
 		*foo = { nullptr, nullptr };
-
-
-		PtrInt* foo2 = (PtrInt*)(m_PointerToData);
-		int a = 42;
 	}
 
 	size_t size = sizeof(PtrInt);
@@ -94,7 +214,16 @@ void BuddyAllocator::Initialize()
 		size += sizeof(PtrInt);
 	}
 
-	size_t numberOfAllocationsOnLeafsNeeded = size / LEAF_SIZE + !(size % LEAF_SIZE == 0);
+	for (size_t i = 0; i < NUMBER_OF_BITSET_FOR_FREE_TABLE; ++i)
+	{
+		SetBitToZero_FreeTable(i);
+		SetBitToZero_SplitTable(i);
+	}
+
+	size = size + (2 * NUMBER_OF_BITSET_FOR_FREE_TABLE / 8);
+
+	size_t numberOfAllocationsOnLeafsNeeded = 
+		(size) / LEAF_SIZE + !(size % LEAF_SIZE == 0);
 
 	SimulateAllocationForLeaves_ForFreeList(numberOfAllocationsOnLeafsNeeded);
 	
@@ -137,7 +266,7 @@ void BuddyAllocator::Free(void* pointerToFree, size_t levelIndex)
 	}
 
 	// check if the level points 
-	if (uniqueIndexOfThePointer < NUMBER_OF_BITSET_FOR_FREE_TABLE && m_SplitTable[uniqueIndexOfThePointer] == 1)
+	if (uniqueIndexOfThePointer < NUMBER_OF_BITSET_FOR_FREE_TABLE && GetBitFromSplitTable(uniqueIndexOfThePointer) == 1)
 	{
 		std::cerr << "BuddyAllocator::Free(void* pointerToFree, size_t levelIndex) m_SplitTable[uniqueIndexOfThePointer] = 1" << '\n';
 		return;
@@ -146,10 +275,11 @@ void BuddyAllocator::Free(void* pointerToFree, size_t levelIndex)
 	while (true)
 	{
 		// the other buddy is free
-		if (m_FreeTable[getParentIndex] == 1)
+		if (GetBitFromFreeTable(getParentIndex) == 1)
 		{
 			// change the m_FreeTable
-			m_FreeTable[getParentIndex] = 0;
+			SetBitToZero_FreeTable(getParentIndex);
+ 			//m_FreeTable[getParentIndex] = 0;
 
 			// add the free slot to the parentLevel of freeSlots
 
@@ -185,8 +315,11 @@ void BuddyAllocator::Free(void* pointerToFree, size_t levelIndex)
 
 			// set the splitTable value of the parent block to 0
 			{
-				assert(m_SplitTable[getParentIndex] == 1);
-				m_SplitTable[getParentIndex] = 0;
+				assert(GetBitFromSplitTable(getParentIndex) == 1);
+				SetBitToZero_SplitTable(getParentIndex);
+
+				//assert(m_SplitTable[getParentIndex] == 1);
+				//m_SplitTable[getParentIndex] = 0;
 			}
 
 			// if has reached top, abort the releasing of blocks
@@ -219,7 +352,8 @@ void BuddyAllocator::Free(void* pointerToFree, size_t levelIndex)
 		else
 		{
 			// change the m_FreeTable
-			m_FreeTable[getParentIndex] = 1;
+			SetBitToOne_FreeTable(getParentIndex);
+			//m_FreeTable[getParentIndex] = 1;
 
 			// set the head of the linkedList to the pointerToFree location
 			if (*((PtrInt*)(m_PointerToData + (sizeof(PtrInt) * levelIndex))) == 0)
@@ -309,7 +443,8 @@ void* BuddyAllocator::Allocate(size_t blockSize)
 				{
 					size_t indexOfParent = GetParent(uniqueIndexOfTheFreeSlot);
 
-					m_FreeTable[indexOfParent] = 1 ^ m_FreeTable[indexOfParent];
+					XOR_Bit_FreeTable(indexOfParent, 1);
+					//m_FreeTable[indexOfParent] = 1 ^ m_FreeTable[indexOfParent];
 				}
 			}
 
@@ -319,6 +454,7 @@ void* BuddyAllocator::Allocate(size_t blockSize)
 				*(levelPointer) = (PtrInt)(freeSlot->next);
 				PtrInt res = PtrInt(freeSlot->next);
 			}
+
 			// has acquired a free block on the expected spot, return the free location
 			if (level == initialLevel)
 			{
@@ -332,8 +468,11 @@ void* BuddyAllocator::Allocate(size_t blockSize)
 				{
 					size_t uniqueIndexOfTheFreeSlot = GetUniqueIndex(freeSlot, level);
 
-					assert(m_SplitTable[uniqueIndexOfTheFreeSlot] == 0);
-					m_SplitTable[uniqueIndexOfTheFreeSlot] = 1;
+					assert(GetBitFromSplitTable(uniqueIndexOfTheFreeSlot) == 0);
+					SetBitToOne_SplitTable(uniqueIndexOfTheFreeSlot);
+
+					//assert(m_SplitTable[uniqueIndexOfTheFreeSlot] == 0);
+					//m_SplitTable[uniqueIndexOfTheFreeSlot] = 1;
 				}
 
 				void* freeSlotNext = (static_cast<unsigned char*>(rawFreeSlot) + GetSizeOfLevel(level + 1));

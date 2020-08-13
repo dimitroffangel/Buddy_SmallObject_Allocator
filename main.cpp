@@ -73,6 +73,60 @@ int main()
 		int d = 42;
 	}
 
+	{
+		PtrInt* foo = new PtrInt(1);
+	
+		unsigned char* testArr = new unsigned char[16];
+		
+		for (size_t i = 0; i < 8; ++i)
+		{
+			testArr[i] = 0;
+		}
+
+		PtrInt* test = (PtrInt*)(testArr);
+		size_t sze = sizeof(PtrInt);
+
+		bool res1 = *test & (1 << 1);
+
+		*test |= (1 << 1);
+
+		bool res2 = *test & (1 << 1);
+
+		//std::cout << test[0] << " " << test[8] << '\n';
+
+		*foo = (*foo) & ~(1 << 2);
+
+		*foo = (*foo) | (1 << 3);
+
+		int breakFoo = 1 << 5 % 6;
+		int breakFoo2 = 1 << (5 % 6);
+
+		int test42 = 42;
+	}
+
+	{
+		PtrInt* foo = new PtrInt(0);
+		PtrInt nonFoo = 1;
+
+		for (size_t i = 0; i < 64; ++i)
+		{
+			if(i != 63)
+				nonFoo *= 2;
+
+			PtrInt res = PtrInt(1) << i;
+			*foo |= res;
+
+		}
+
+
+
+		for (size_t i = 0; i < 63; ++i)
+		{
+		}
+
+		std::cout << nonFoo << '\n';
+	}
+
 
 	SmallObjectAllocator::Initialize();
 
@@ -89,19 +143,19 @@ int main()
 	std::vector<EpicFoo*> foos;
 	foos.reserve(size);
 
-	for (size_t i = 0; i < 511; i++)
+	for (size_t i = 0; i < 510; i++)
 	{
 		//void* rawPointer = smallObject.operator new(sizeOfFoo)
 		void* rawPointer = buddyAllocator.Allocate(sizeof(EpicFoo));
 
 		EpicFoo* result = new (rawPointer) EpicFoo();
-
+		
 		foos.push_back(result);
 	//	Foo* result1 = new Foo();
 	//	foos.push_back(result1);
 	}
 
-	for (size_t i = 0; i < 511; i++)
+	for (size_t i = 0; i < 510; i++)
 	{
 		//delete foos[i];
 		

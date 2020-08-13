@@ -26,11 +26,21 @@ struct FreeListInformation
 struct BuddyAllocator
 {
 	static const int MAX_LEVELS = 16;
-	static const int NUMBER_OF_BITSET_FOR_FREE_TABLE = DEFAULT_BUDDY_ALLOCATOR_SIZE / LEAF_SIZE;
+	static const size_t NUMBER_OF_BITSET_FOR_FREE_TABLE = DEFAULT_BUDDY_ALLOCATOR_SIZE / LEAF_SIZE;
 
 private:
 	void SimulateAllocationForLeaves_ForFreeList(size_t numberOfAllocationsOnLeafsNeeded);
-	void SimulateAllocationForLeaves_ForBitsetFreeTable(size_t numberOfAllocationsNeeded);
+
+	inline void SetBitToOne_FreeTable(const size_t parentIndex);
+	inline void SetBitToZero_FreeTable(const size_t parentIndex);
+	inline bool GetBitFromFreeTable(const size_t parentIndex);
+	inline void XOR_Bit_FreeTable(const size_t parentIndex, const bool XOR_Argument);
+
+	inline void SetBitToOne_SplitTable(const size_t parentIndex);
+	inline void SetBitToZero_SplitTable(const size_t parentIndex);
+	inline bool GetBitFromSplitTable(const size_t parentIndex);
+	inline void XOR_Bit_SplitTable(const size_t parentIndex, const bool XOR_Argument);
+
 
 public:
 	void Initialize();
@@ -41,8 +51,8 @@ public:
 
 private:
 	//void* m_FreeLists[MAX_LEVELS];
-	std::bitset<NUMBER_OF_BITSET_FOR_FREE_TABLE> m_FreeTable;
-	std::bitset<NUMBER_OF_BITSET_FOR_FREE_TABLE> m_SplitTable;
+	//std::bitset<NUMBER_OF_BITSET_FOR_FREE_TABLE> m_FreeTable;
+	//std::bitset<NUMBER_OF_BITSET_FOR_FREE_TABLE> m_SplitTable;
 	size_t m_NumberOfLevels = MAX_LEVELS;
 
 	unsigned char* m_PointerToData;
