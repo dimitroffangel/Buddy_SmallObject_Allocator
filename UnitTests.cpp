@@ -182,6 +182,37 @@ void UnitTests::Allocate_Via_Buddy_BigObjects_Add_Delete(const BuddyAllocatorObj
 	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << '\n';
 }
 
+void UnitTests::Allocate_Via_Buddy_RandomObject_DeleteRandomPosition(const BuddyAllocatorObject& buddyAllocator, const SmallObject& smallObject)
+{	
+	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+
+	const int blocks = 4;
+	const size_t sizeOfPtrInt = sizeof(PtrInt);
+	const size_t sizeOfFoo = sizeof(Foo);
+	const size_t sizeOfEpicFoo = sizeof(EpicFoo);
+	const size_t sizeofGiantFoo = sizeof(GiantFoo);
+
+	const int size = 10000;
+
+	std::vector<GiantFoo*> giantFoos;
+	giantFoos.reserve(size);
+
+	for (size_t i = 0; i < size; i++)
+	{
+			void* rawPointer2 = buddyAllocator.operator new(sizeof(GiantFoo));
+
+			GiantFoo* res2 = new (rawPointer2) GiantFoo();
+
+			giantFoos.push_back(res2);
+
+			giantFoos[i]->~GiantFoo();
+			buddyAllocator.operator delete(giantFoos[i]);
+		}
+
+	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << '\n';
+}
+
 void UnitTests::Allocate_Via_Default_SmallObjects()
 {
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
