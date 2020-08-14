@@ -65,7 +65,7 @@ class GiantFoo
 struct UnitTests
 {
 	void Allocate_Via_Buddy_SmallObjects(const BuddyAllocatorObject&, const SmallObject&);
-	void Allocate_Via_Buddy_SmallObjects_Add_Delete(const BuddyAllocatorObject&, const SmallObject&);
+	void Allocate_Via_Buddy_AllObjects_Add_Delete(const BuddyAllocatorObject&, const SmallObject&);
 	void Allocate_Via_Buddy_BigObjects(const BuddyAllocatorObject&, const SmallObject&);
 	void Allocate_Via_Buddy_BigObjects_Add_Delete(const BuddyAllocatorObject& , const SmallObject&);
 	void Allocate_Via_Buddy_RandomObject_DeleteRandomPosition(const BuddyAllocatorObject& , const SmallObject&);
@@ -77,7 +77,7 @@ struct UnitTests
 	void Allocate_Via_Slab_RandomObject_DeleteRandomPosition(const BuddyAllocatorObject&, const SmallObject&);
 
 	void Allocate_Via_Default_SmallObjects();
-	void Allocate_Via_Default_SmallObjects_Add_Delete();
+	void Allocate_Via_Default_AllObjects_Add_Delete();
 	void Allocate_Via_Default_BigObjects();
 	void Allocate_Via_Default_BigObjects_Add_Delete();
 	void Allocate_Via_Default_RandomObject_DeleteRandomPosition();
