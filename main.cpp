@@ -20,6 +20,8 @@ int main()
 	unitTests.Allocate_Via_Buddy_BigObjects_Add_Delete(buddyAllocator, smallObject);
 	unitTests.Allocate_Via_Buddy_AllObjects_Add_Delete(buddyAllocator, smallObject);
 	unitTests.Allocate_Via_Buddy_RandomObject_DeleteRandomPosition(buddyAllocator, smallObject);
+	unitTests.Allocate_Via_Buddy_SmallObjects(buddyAllocator, smallObject);
+	unitTests.Allocate_Via_Buddy_SmallObjects_Add_Delete(buddyAllocator, smallObject);
 
 	std::cout << "Slab allocator..." << '\n';
 	
@@ -27,6 +29,8 @@ int main()
 	unitTests.Allocate_Via_Slab_SmallObjects_Add_Delete(buddyAllocator, smallObject);
 	unitTests.Allocate_Via_Slab_AllObjects_Add_Delete(buddyAllocator, smallObject);
 	unitTests.Allocate_Via_Slab_RandomObject_DeleteRandomPosition(buddyAllocator, smallObject);
+	unitTests.Allocate_Via_Slab_BigObjects(buddyAllocator, smallObject);
+	unitTests.Allocate_Via_Slab_BigObjects_Add_Delete(buddyAllocator, smallObject);
 
 	std::cout << "Default allocator..." << '\n';
 
