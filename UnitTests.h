@@ -1,9 +1,9 @@
 #ifndef UNITTESTS_H_GUARD
 #define UNITTESTS_H_GUARD
 
-#include "FastLogarithm.h"
 
 #include "SmallObject.h"
+#include "BuddyAllocator.h"
 #include "BuddyAllocatorObject.h"
 
 class Foo
@@ -68,13 +68,20 @@ struct UnitTests
 	void Allocate_Via_Buddy_SmallObjects_Add_Delete(const BuddyAllocatorObject&, const SmallObject&);
 	void Allocate_Via_Buddy_BigObjects(const BuddyAllocatorObject&, const SmallObject&);
 	void Allocate_Via_Buddy_BigObjects_Add_Delete(const BuddyAllocatorObject& , const SmallObject&);
-	void Allocate_RandomObject_DeleteRandomPosition(const BuddyAllocatorObject& , const SmallObject&);
+	void Allocate_Via_Buddy_RandomObject_DeleteRandomPosition(const BuddyAllocatorObject& , const SmallObject&);
 
 	void Allocate_Via_Slab_SmallObjects(const BuddyAllocatorObject&, const SmallObject&);
 	void Allocate_Via_Slab_SmallObjects_Add_Delete(const BuddyAllocatorObject&, const SmallObject&);
 	void Allocate_Via_Slab_BigObjects(const BuddyAllocatorObject&, const SmallObject&);
 	void Allocate_Via_Slab_BigObjects_Add_Delete(const BuddyAllocatorObject&, const SmallObject&);
-	void Allocate_RandomObject_DeleteRandomPosition(const BuddyAllocatorObject&, const SmallObject&);
+	void Allocate_Via_Slab_RandomObject_DeleteRandomPosition(const BuddyAllocatorObject&, const SmallObject&);
+
+	void Allocate_Via_Default_SmallObjects();
+	void Allocate_Via_Default_SmallObjects_Add_Delete();
+	void Allocate_Via_Default_BigObjects();
+	void Allocate_Via_Default_BigObjects_Add_Delete();
+	void Allocate_Via_Default_RandomObject_DeleteRandomPosition();
+
 };
 
 #endif

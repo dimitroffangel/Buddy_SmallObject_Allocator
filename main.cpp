@@ -2,8 +2,6 @@
 #include <vector>
 
 #include "SmallObject.h"
-#include "BuddyAllocator.h"
-#include "BuddyAllocatorObject.h"
 #include "UnitTests.h"
 
 int main()
@@ -14,8 +12,11 @@ int main()
 	SmallObject smallObject;
 	BuddyAllocatorObject buddyAllocator;
 
+	UnitTests unitTests;
 
+	unitTests.Allocate_Via_Buddy_SmallObjects(buddyAllocator, smallObject);
 
+	unitTests.Allocate_Via_Default_SmallObjects();
 
 	SmallObjectAllocator::Shutdown();
 	BuddyAllocator::Shutdown();

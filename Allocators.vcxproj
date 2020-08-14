@@ -131,6 +131,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="SmallObject.cpp" />
     <ClCompile Include="SmallObjectAllocator.cpp" />
+    <ClCompile Include="UnitTests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BuddyAllocator.h" />
@@ -141,6 +142,7 @@
     <ClInclude Include="SharedHandler.h" />
     <ClInclude Include="SmallObject.h" />
     <ClInclude Include="SmallObjectAllocator.h" />
+    <ClInclude Include="UnitTests.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
