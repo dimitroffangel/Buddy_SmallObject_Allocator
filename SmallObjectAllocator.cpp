@@ -55,7 +55,8 @@ void SmallObjectAllocator::Deallocate(void* pointer, std::size_t numberOfBytes)
 	if (numberOfBytes > m_MaxObjectSize)
 	{
 		std::cerr << "Object too large, it cannot be here..." << '\n';
-		return operator delete(pointer);
+		delete pointer;
+		return;
 	}
 
 	if (m_PointerToLastDeallocator != nullptr && m_PointerToLastDeallocator->BlockSize() == numberOfBytes)

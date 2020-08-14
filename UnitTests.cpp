@@ -535,16 +535,16 @@ void UnitTests::Allocate_Via_Slab_AllObjects_Add_Delete(const BuddyAllocatorObje
 		giantFoos.push_back(res2);
 
 		giantFoos[i]->~GiantFoo();
-		smallObject.operator delete(giantFoos[i], sizeofGiantFoo);
-
+		smallObject.operator delete(giantFoos[i], sizeof(GiantFoo));
 
 		void* rawPointer3 = smallObject.operator new(sizeof(EpicFoo));
 
-		EpicFoo* res3 = new (rawPointer2) EpicFoo();
+		EpicFoo* res3 = new (rawPointer3) EpicFoo();
 
 		epicFoos.push_back(res3);
 
 		epicFoos[i]->~EpicFoo();
+
 		smallObject.operator delete(epicFoos[i], sizeof(EpicFoo));
 	}
 
