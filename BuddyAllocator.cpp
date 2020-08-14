@@ -521,6 +521,12 @@ void* BuddyAllocator::Allocate(size_t blockSize)
 		return g_SmallObjectAllocator->Allocate(blockSize);
 	}
 
+	if (blockSize > DEFAULT_BUDDY_ALLOCATOR_SIZE)
+	{
+		std::cout << "Size is bigger than the allocated block..." << '\n';
+		return operator new(blockSize);
+	}
+
 	size_t initialLevel = m_NumberOfLevels - FastLogarithm::Log2_64(blockSize) + !FastOperationsWithTwo::IsPowerOfTwo(blockSize);
 
 	size_t levelSize = GetSizeOfLevel(initialLevel);
