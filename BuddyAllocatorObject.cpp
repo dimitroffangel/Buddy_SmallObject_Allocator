@@ -20,6 +20,8 @@ void BuddyAllocatorObject::operator delete(void* pointer, size_t size)
 
 void BuddyAllocatorObject::operator delete(void* pointer)
 {
+	std::lock_guard<std::mutex> guardian(m_LockOperation);
+
 	g_BuddyAllocator->Free(pointer);
 }
 
