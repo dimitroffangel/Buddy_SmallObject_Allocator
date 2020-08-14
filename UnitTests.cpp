@@ -7,6 +7,8 @@
 
 void UnitTests::Allocate_Via_Buddy_SmallObjects(const BuddyAllocatorObject& buddyAllocator, const SmallObject& smallObject)
 {
+	std::cout << "UnitTests::Allocate_Via_Buddy_SmallObjects(): ";
+
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
 	const int blocks = 4;
@@ -53,6 +55,7 @@ void UnitTests::Allocate_Via_Buddy_SmallObjects(const BuddyAllocatorObject& budd
 
 void UnitTests::Allocate_Via_Buddy_SmallObjects_Add_Delete(const BuddyAllocatorObject& buddyAllocator, const SmallObject&)
 {
+	std::cout << "UnitTests::Allocate_Via_Buddy_SmallObjects_Add_Delete(): ";
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
 	const int blocks = 4;
@@ -86,6 +89,7 @@ void UnitTests::Allocate_Via_Buddy_SmallObjects_Add_Delete(const BuddyAllocatorO
 
 void UnitTests::Allocate_Via_Buddy_BigObjects(const BuddyAllocatorObject& buddyAllocator, const SmallObject& smallObject)
 {
+	std::cout << "UnitTests::Allocate_Via_Buddy_BigObjects(): ";
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
 	const int blocks = 4;
@@ -132,6 +136,8 @@ void UnitTests::Allocate_Via_Buddy_BigObjects(const BuddyAllocatorObject& buddyA
 
 void UnitTests::Allocate_Via_Buddy_BigObjects_Add_Delete(const BuddyAllocatorObject& buddyAllocator, const SmallObject& smallObject)
 {
+	std::cout << "UnitTests::Allocate_Via_Buddy_BigObjects_Add_Delete(): ";
+
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
 	const int blocks = 4;
@@ -165,6 +171,8 @@ void UnitTests::Allocate_Via_Buddy_BigObjects_Add_Delete(const BuddyAllocatorObj
 
 void UnitTests::Allocate_Via_Buddy_AllObjects_Add_Delete(const BuddyAllocatorObject& buddyAllocator, const SmallObject& smallObject)
 {
+	std::cout << "UnitTests::Allocate_Via_Buddy_AllObjects_Add_Delete(): ";
+
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
 	const int blocks = 4;
@@ -222,6 +230,8 @@ void UnitTests::Allocate_Via_Buddy_AllObjects_Add_Delete(const BuddyAllocatorObj
 
 void UnitTests::Allocate_Via_Buddy_RandomObject_DeleteRandomPosition(const BuddyAllocatorObject& buddyAllocator, const SmallObject& smallObject)
 {	
+	std::cout << "UnitTests::Allocate_Via_Buddy_RandomObject_DeleteRandomPosition(): ";
+
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
 	const int blocks = 4;
@@ -281,6 +291,8 @@ void UnitTests::Allocate_Via_Buddy_RandomObject_DeleteRandomPosition(const Buddy
 
 void UnitTests::Allocate_Via_Slab_SmallObjects(const BuddyAllocatorObject& buddyAllocator, const SmallObject& smallObject)
 {
+	std::cout << "UnitTests::Allocate_Via_Slab_SmallObjects(): ";
+
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
 	const int blocks = 4;
@@ -323,6 +335,8 @@ void UnitTests::Allocate_Via_Slab_SmallObjects(const BuddyAllocatorObject& buddy
 
 void UnitTests::Allocate_Via_Slab_SmallObjects_Add_Delete(const BuddyAllocatorObject&, const SmallObject& smallObject)
 {
+	std::cout << "UnitTests::Allocate_Via_Slab_SmallObjects_Add_Delete(): ";
+
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
 	const int blocks = 4;
@@ -356,6 +370,8 @@ void UnitTests::Allocate_Via_Slab_SmallObjects_Add_Delete(const BuddyAllocatorOb
 
 void UnitTests::Allocate_Via_Slab_BigObjects(const BuddyAllocatorObject&, const SmallObject& smallObject)
 {
+	std::cout << "UnitTests::Allocate_Via_Slab_BigObjects(): ";
+
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
 	const int blocks = 4;
@@ -403,6 +419,8 @@ void UnitTests::Allocate_Via_Slab_BigObjects(const BuddyAllocatorObject&, const 
 
 void UnitTests::Allocate_Via_Slab_BigObjects_Add_Delete(const BuddyAllocatorObject&, const SmallObject& smallObject)
 {
+	std::cout << "UnitTests::Allocate_Via_Slab_BigObjects_Add_Delete(): ";
+
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
 	const int blocks = 4;
@@ -436,6 +454,8 @@ void UnitTests::Allocate_Via_Slab_BigObjects_Add_Delete(const BuddyAllocatorObje
 
 void UnitTests::Allocate_Via_Slab_RandomObject_DeleteRandomPosition(const BuddyAllocatorObject&, const SmallObject& smallObject)
 {
+	std::cout << "UnitTests::Allocate_Via_Slab_RandomObject_DeleteRandomPosition(): ";
+
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
 	const int blocks = 4;
@@ -497,6 +517,8 @@ void UnitTests::Allocate_Via_Slab_RandomObject_DeleteRandomPosition(const BuddyA
 
 void UnitTests::Allocate_Via_Slab_AllObjects_Add_Delete(const BuddyAllocatorObject&, const SmallObject& smallObject)
 {
+	std::cout << "UnitTests::Allocate_Via_Slab_AllObjects_Add_Delete(): ";
+
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
 	const int blocks = 4;
@@ -553,6 +575,8 @@ void UnitTests::Allocate_Via_Slab_AllObjects_Add_Delete(const BuddyAllocatorObje
 
 void UnitTests::Allocate_Via_Default_SmallObjects()
 {
+	std::cout << "UnitTests::Allocate_Via_Default_SmallObjects(): ";
+
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
 	const int blocks = 4;
@@ -584,6 +608,8 @@ void UnitTests::Allocate_Via_Default_SmallObjects()
 
 void UnitTests::Allocate_Via_Default_SmallObjects_Add_Delete()
 {
+	std::cout << "UnitTests::Allocate_Via_Default_SmallObjects_Add_Delete(): ";
+
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
 	const int blocks = 4;
@@ -612,6 +638,8 @@ void UnitTests::Allocate_Via_Default_SmallObjects_Add_Delete()
 
 void UnitTests::Allocate_Via_Default_AllObjects_Add_Delete()
 {
+	std::cout << "UnitTests::Allocate_Via_Default_AllObjects_Add_Delete(): ";
+
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
 	const int blocks = 4;
@@ -661,6 +689,8 @@ void UnitTests::Allocate_Via_Default_AllObjects_Add_Delete()
 
 void UnitTests::Allocate_Via_Default_BigObjects()
 {
+	std::cout << "UnitTests::Allocate_Via_Default_BigObjects(): ";
+
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
 	const int blocks = 4;
@@ -692,6 +722,8 @@ void UnitTests::Allocate_Via_Default_BigObjects()
 
 void UnitTests::Allocate_Via_Default_BigObjects_Add_Delete()
 {
+	std::cout << "UnitTests::Allocate_Via_Default_BigObjects_Add_Delete(): ";
+
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
 	const int blocks = 4;
@@ -719,6 +751,8 @@ void UnitTests::Allocate_Via_Default_BigObjects_Add_Delete()
 
 void UnitTests::Allocate_Via_Default_RandomObject_DeleteRandomPosition()
 {
+	std::cout << "UnitTests::Allocate_Via_Default_RandomObject_DeleteRandomPosition(): ";
+
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
 	const int blocks = 4;

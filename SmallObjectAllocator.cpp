@@ -14,7 +14,7 @@ void* SmallObjectAllocator::Allocate(std::size_t numberOfBytes)
 {
 	if (numberOfBytes > m_MaxObjectSize)
 	{
-		std::cout << "Object too big, will use the default new..." << '\n';
+		//std::cout << "Object too big, will use the default new..." << '\n';
 		return operator new(numberOfBytes);
 	}
 
@@ -54,7 +54,7 @@ void SmallObjectAllocator::Deallocate(void* pointer, std::size_t numberOfBytes)
 
 	if (numberOfBytes > m_MaxObjectSize)
 	{
-		std::cerr << "Object too large, it cannot be here..." << '\n';
+		//std::cerr << "Object too large, it cannot be here..." << '\n';
 		delete pointer;
 		return;
 	}
