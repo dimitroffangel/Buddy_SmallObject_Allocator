@@ -155,7 +155,7 @@ void UnitTests::Allocate_Via_Buddy_BigObjects_Add_Delete(const BuddyAllocatorObj
 		foos.push_back(result);
 
 		foos[i]->~GiantFoo();
-		buddyAllocator.operator delete(foos[size - i - 1], sizeof(GiantFoo));
+		buddyAllocator.operator delete(foos[i], sizeof(GiantFoo));
 	}
 
 
