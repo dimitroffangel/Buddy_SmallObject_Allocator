@@ -41,13 +41,10 @@ void BuddyAllocator::SimulateAllocationForLeaves_ForFreeList(size_t numberOfAllo
 			*(PtrInt*)(m_PointerToData + sizeof(PtrInt) * level) =
 				(PtrInt)(m_PointerToData + (GetSizeOfLevel(level) * numberOfAllocationsOnLeafsNeeded));
 
-			PtrInt* fooProdigy = (PtrInt*)(m_PointerToData + (sizeof(PtrInt) * level));
-			FreeListInformation* fooProdigyInfo = (FreeListInformation*)(*fooProdigy);
+			//PtrInt* fooProdigy = (PtrInt*)(m_PointerToData + (sizeof(PtrInt) * level));
+			//FreeListInformation* fooProdigyInfo = (FreeListInformation*)(*fooProdigy);
 
 			*((FreeListInformation*)(m_PointerToData + (GetSizeOfLevel(level) * numberOfAllocationsOnLeafsNeeded))) = { nullptr, nullptr };
-
-
-			int a = 42;
  		}
 
 		numberOfAllocationsOnLeafsNeeded = numberOfAllocationsOnLeafsNeeded / 2 + !(numberOfAllocationsOnLeafsNeeded % 2 == 0);
@@ -68,9 +65,12 @@ void BuddyAllocator::SetBitToOne_FreeTable(const size_t parentIndex)
 
 	(*static_cast<PtrInt*>(address)) |= (PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)));
 
-	bool res2 = (*static_cast<PtrInt*>(address)) & (PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)));
+	//bool res2 = (*static_cast<PtrInt*>(address)) & (PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)));
 
-	bool res = GetBitFromFreeTable(parentIndex);
+	//bool res = GetBitFromFreeTable(parentIndex);
+
+	assert((*static_cast<PtrInt*>(address)) & (PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8))));
+	assert(GetBitFromFreeTable(parentIndex));
 }
 
 void BuddyAllocator::SetBitToZero_FreeTable(const size_t parentIndex)
@@ -83,9 +83,13 @@ void BuddyAllocator::SetBitToZero_FreeTable(const size_t parentIndex)
 
 	(*static_cast<PtrInt*>(address)) &= ~(PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)));
 
-	bool res2 = (*static_cast<PtrInt*>(address)) & (PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)));
+	//bool res2 = (*static_cast<PtrInt*>(address)) & (PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)));
 
-	bool res = GetBitFromFreeTable(parentIndex);
+	//bool res = GetBitFromFreeTable(parentIndex);
+
+
+	assert(!((*static_cast<PtrInt*>(address)) & (PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)))));
+	assert(!GetBitFromFreeTable(parentIndex));
 }
 
 inline bool BuddyAllocator::GetBitFromFreeTable(const size_t parentIndex)
@@ -94,7 +98,7 @@ inline bool BuddyAllocator::GetBitFromFreeTable(const size_t parentIndex)
 
 	void* address = (m_PointerToData + ((highestLevel) * sizeof(PtrInt)) + sizeof(PtrInt) * ((parentIndex / sizeof(PtrInt)) / 8));
 
-	bool res = (*static_cast<PtrInt*>(address)) & (PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)));
+	//bool res = (*static_cast<PtrInt*>(address)) & (PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)));
 
 	return (*static_cast<PtrInt*>(address)) & (PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)));
 }
@@ -127,9 +131,12 @@ void BuddyAllocator::SetBitToOne_SplitTable(const size_t parentIndex)
 
 	(*static_cast<PtrInt*>(address)) |= (PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)));
 
-	bool res2 = (*static_cast<PtrInt*>(address)) & (PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)));
+	//bool res2 = (*static_cast<PtrInt*>(address)) & (PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)));
 
-	bool res = GetBitFromSplitTable(parentIndex);
+	//bool res = GetBitFromSplitTable(parentIndex);
+
+	assert((*static_cast<PtrInt*>(address)) & (PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8))));
+	assert(GetBitFromSplitTable(parentIndex));
 }
 
 void BuddyAllocator::SetBitToZero_SplitTable(const size_t parentIndex)
@@ -144,9 +151,12 @@ void BuddyAllocator::SetBitToZero_SplitTable(const size_t parentIndex)
 
 	(*static_cast<PtrInt*>(address)) &= ~(PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)));
 
-	bool res2 = (*static_cast<PtrInt*>(address)) & (PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)));
+	//bool res2 = (*static_cast<PtrInt*>(address)) & (PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)));
 
-	bool res = GetBitFromSplitTable(parentIndex);
+	//bool res = GetBitFromSplitTable(parentIndex);
+
+	assert(!((*static_cast<PtrInt*>(address)) & (PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)))));
+	assert(!GetBitFromSplitTable(parentIndex));
 }
 
 inline bool BuddyAllocator::GetBitFromSplitTable(const size_t parentIndex)
@@ -156,7 +166,7 @@ inline bool BuddyAllocator::GetBitFromSplitTable(const size_t parentIndex)
 	void* address = (m_PointerToData + ((highestLevel) * sizeof(PtrInt)) + (NUMBER_OF_BITSET_FOR_FREE_TABLE / 8) +
 		(sizeof(PtrInt) * ((parentIndex / sizeof(PtrInt)) / 8)));
 
-	bool res = (*static_cast<PtrInt*>(address)) & (PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)));
+	//bool res = (*static_cast<PtrInt*>(address)) & (PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)));
 
 	return (*static_cast<PtrInt*>(address)) & (PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)));
 }
