@@ -248,8 +248,6 @@ void BuddyAllocator::Initialize()
 
 void BuddyAllocator::Free(void* pointerToFree, size_t levelIndex)
 {
-	// TODO::: assert that the pointer is in the range
-
 	if (pointerToFree == nullptr)
 	{
 		return;

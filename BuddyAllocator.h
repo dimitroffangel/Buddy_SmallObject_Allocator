@@ -80,7 +80,7 @@ public:
 	inline size_t IndexInLevel(size_t uniqueIndex)
 	{
 		size_t levelOfIndex = GetLevel(uniqueIndex);
-		size_t firstUniqueIndexOnLevel = (1 << levelOfIndex) - 1;
+		size_t firstUniqueIndexOnLevel = ((PtrInt)1 << levelOfIndex) - 1;
 
 		return uniqueIndex - firstUniqueIndexOnLevel;
 	}
@@ -104,7 +104,7 @@ public:
 			uniqueIndex = indexInLevelOfThePointer + firstUniqueIndexOnLevel
 		*/ 
 		
-		size_t firstUniqueIndexOnLevel = (1 << levelIndex) - 1;
+		size_t firstUniqueIndexOnLevel = ((PtrInt)1 << levelIndex) - 1;
 	
 		size_t indexInLevelOfThePointer = IndexInLevelOf(pointer, levelIndex);
 	
@@ -128,7 +128,7 @@ public:
 
 	inline size_t GetUniqueIndex(size_t localIndexInLevel, size_t levelIndex)
 	{
-		size_t firstUniqueIndexInLevel = (1 << levelIndex) - 1;
+		size_t firstUniqueIndexInLevel = (PtrInt(1) << levelIndex) - 1;
 		
 		return localIndexInLevel + firstUniqueIndexInLevel;
 	}
