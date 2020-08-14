@@ -89,6 +89,13 @@ public:
 	{
 		// pointer substraction
 
+		if (!((uintptr_t)(pointer) >= (uintptr_t)m_PointerToData &&
+			(uintptr_t)(pointer) < (uintptr_t)(pointer)+(uintptr_t)(GetTotalSize())))
+		{
+			std::cerr << "BuddyAllocator()::IndexInLevelOf(void*, size_t) pointer was out of range" << '\n';
+			return 0;
+		}
+
 		unsigned char* getUnsignedCharPointer = static_cast<unsigned char*>(pointer);
 
 		size_t res = getUnsignedCharPointer - m_PointerToData;
