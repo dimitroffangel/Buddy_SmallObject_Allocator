@@ -49,7 +49,7 @@ public:
 	void Free(void* pointer);
 	void* Allocate(size_t blockSize);
 
-private:
+public:
 	size_t m_NumberOfLevels = MAX_LEVELS;
 
 	unsigned char* m_PointerToData;

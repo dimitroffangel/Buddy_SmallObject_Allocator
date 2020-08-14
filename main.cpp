@@ -86,6 +86,8 @@ int main()
 	//	foos.push_back(result1);
 	}
 
+	buddyAllocator.Free(buddyAllocator.m_PointerToData + sizeof(PtrInt), 9);
+
 	for (size_t i = 0; i < 508; i++)
 	{
 		//delete foos[i];
