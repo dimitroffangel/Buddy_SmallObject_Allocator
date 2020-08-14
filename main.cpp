@@ -1,6 +1,5 @@
 #include <iostream>
 #include <vector>
-#include <functional>
 
 #include "SmallObject.h"
 #include "BuddyAllocator.h"
@@ -43,26 +42,16 @@ class EpicFoo
 	PtrInt eighth8;
 };
 
-void InitializeSystems()
-{
-	SmallObjectAllocator::Initialize();
-}
-
-void ShutdownSystems()
-{
-	SmallObjectAllocator::Shutdown();
-}
-
 int main()
 {	
-	//SmallObjectAllocator::Initialize();
+	SmallObjectAllocator::Initialize();
 	BuddyAllocator::Initialize();
 
 	const int blocks = 4;
 	int sizeOfFoo = sizeof(Foo);
 	int sizeOfEpicFoo = sizeof(EpicFoo);
 
-	//SmallObject smallObject;
+	SmallObject smallObject;
 	BuddyAllocatorObject buddyAllocator;
 
 
@@ -71,9 +60,9 @@ int main()
 	std::vector<EpicFoo*> foos;
 	foos.reserve(size);
 
-	for (size_t i = 0; i < size; i++)
+	for (size_t i = 0; i < 510; i++)
 	{
-		//void* rawPointer = smallObject.operator new(sizeOfFoo)
+		//void* rawPointer = smallObject.operator new(sizeOfFoo);
 		void* rawPointer = buddyAllocator.operator new(sizeof(EpicFoo));
 
 		EpicFoo* result = new (rawPointer) EpicFoo();
@@ -83,7 +72,7 @@ int main()
 		//foos.push_back(result1);
 	}
 
-	for (size_t i = 0; i < size; i++)
+	for (size_t i = 0; i < 510; i++)
 	{
 		//delete foos[i];
 		
@@ -94,11 +83,10 @@ int main()
 		//smallObject.operator delete(foos[size - i - 1], sizeOfFoo);
 		//smallObject.operator delete(foos[i], sizeOfFoo);
 		
-
 		//std::cout << size - i - 1 << " " << foos[size - i - 1]->a << "\n" ;
 	}
 
-	//SmallObjectAllocator::Shutdown();
+	SmallObjectAllocator::Shutdown();
 	BuddyAllocator::Shutdown();
 
 	return 0;

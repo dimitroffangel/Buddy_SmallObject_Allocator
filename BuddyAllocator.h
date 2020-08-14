@@ -15,7 +15,7 @@
 	(1 << numberOfLevels) - 1 - number of indices
 */
 
-const PtrInt DEFAULT_BUDDY_ALLOCATOR_SIZE = PtrInt(1) << 31;
+const PtrInt DEFAULT_BUDDY_ALLOCATOR_SIZE = PtrInt(1) << 16;
 const PtrInt LEAF_SIZE = PtrInt(1) << 7;
 
 struct FreeListInformation
@@ -26,7 +26,7 @@ struct FreeListInformation
 
 class BuddyAllocator
 {
-	static const int MAX_LEVELS = 31;
+	static const int MAX_LEVELS = 16;
 	static const size_t NUMBER_OF_BITSET_FOR_FREE_TABLE = DEFAULT_BUDDY_ALLOCATOR_SIZE / LEAF_SIZE;
 
 public:
@@ -60,7 +60,7 @@ public:
 	void Free(void* pointer, size_t levelIndex);
 	void Free(void* pointer);
 	void* Allocate(size_t blockSize);
-
+	
 public:
 	size_t m_NumberOfLevels = MAX_LEVELS;
 

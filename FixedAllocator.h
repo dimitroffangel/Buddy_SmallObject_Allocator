@@ -25,9 +25,11 @@ private:
 
 public:
 	explicit FixedAllocator(std::size_t blockSize = 0);
+	~FixedAllocator();
+
+public:
 	FixedAllocator(const FixedAllocator&);
 	FixedAllocator& operator=(const FixedAllocator&);
-	~FixedAllocator();
 
 	void* Allocate();
 	void Deallocate(void* pointer);

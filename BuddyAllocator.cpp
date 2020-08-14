@@ -215,7 +215,7 @@ BuddyAllocator::BuddyAllocator()
 		size += sizeof(PtrInt);
 	}
 
-	for (size_t i = 0; i < NUMBER_OF_BITSET_FOR_FREE_TABLE; ++i)
+	for (size_t i = 0; i < NUMBER_OF_BITSET_FOR_FREE_TABLE; i+=sizeof(PtrInt)*8)
 	{
 		void* freeTableAddress = (m_PointerToData + ((MAX_LEVELS) * sizeof(PtrInt)) + sizeof(PtrInt) * ((i / sizeof(PtrInt)) / 8));
 		void* splitTableAddress = (m_PointerToData + ((MAX_LEVELS) * sizeof(PtrInt)) + (NUMBER_OF_BITSET_FOR_FREE_TABLE / 8) +
@@ -451,33 +451,10 @@ void BuddyAllocator::Free(void* pointerToFree, size_t levelIndex)
 
 void BuddyAllocator::Free(void* pointerToFree)
 {
-	//// assert that the pointer is in the range
-
-	//if (pointer == nullptr)
-	//{
-	//	return;
-	//}
-
-	//size_t levelIndex = 0;
-	//// find the pointer where is positioned
-	//while (true)
-	//{
-	//	if (levelIndex == MAX_LEVELS)
-	//	{
-	//		break;
-	//	}
-
-	//	if (m_FreeLists[levelIndex] == nullptr)
-	//	{
-	//		++levelIndex;
-	//	}
-
-
 	if (pointerToFree == nullptr)
 	{
 		return;
 	}
-
 
 	// the pointer may be to a location, which is split, not used
 	bool a = uintptr_t(pointerToFree) >= (uintptr_t)(m_PointerToData);
@@ -501,19 +478,26 @@ void BuddyAllocator::Free(void* pointerToFree)
 
 	int initialLevel = 0;
 
-	while (true)
+	const size_t highestLevel = m_NumberOfLevels - FastLogarithm::Log2_64(LEAF_SIZE);
+
+	while (initialLevel < highestLevel)
 	{
 		size_t uniqueIndex = GetUniqueIndex(pointerToFree, initialLevel);
-		
+
 		if (GetBitFromSplitTable(uniqueIndex) == 1)
 		{
 			++initialLevel;
+
+			if (initialLevel == 9)
+			{
+				break;
+			}
 		}
 
 		else
 		{
 			size_t parentIndex = GetParent(uniqueIndex);
-			assert(GetBitFromFreeTable(parentIndex) == 1);
+			assert(GetBitFromSplitTable(parentIndex) == 1);
 			break;
 		}
 	}
@@ -580,7 +564,9 @@ void* BuddyAllocator::Allocate(size_t blockSize)
 				{
 					size_t uniqueIndexOfTheFreeSlot = GetUniqueIndex(freeSlot, level);
 
+					assert(level <= m_NumberOfLevels - FastLogarithm::Log2_64(LEAF_SIZE));
 					assert(GetBitFromSplitTable(uniqueIndexOfTheFreeSlot) == 0);
+
 					SetBitToOne_SplitTable(uniqueIndexOfTheFreeSlot);
 
 					//assert(m_SplitTable[uniqueIndexOfTheFreeSlot] == 0);
