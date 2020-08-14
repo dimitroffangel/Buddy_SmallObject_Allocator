@@ -91,7 +91,7 @@ int main()
 		
 		foos[i]->~EpicFoo();
 
-		buddyAllocator.Free(foos[i], 9);
+		buddyAllocator.Free(foos[i], 24);
 
 		//smallObject.operator delete(foos[size - i - 1], sizeOfFoo);
 		//smallObject.operator delete(foos[i], sizeOfFoo);

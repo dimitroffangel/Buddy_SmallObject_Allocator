@@ -264,26 +264,18 @@ void BuddyAllocator::Free(void* pointerToFree, size_t levelIndex)
 		return;
 	}
 
-	size_t uniqueIndexOfThePointer = GetUniqueIndex(pointerToFree, levelIndex);
-	size_t buddyIndexOfThePointerInLevel = GetBuddy(pointerToFree, levelIndex);
-	size_t buddyIndexOfThePointer = GetUniqueIndex(buddyIndexOfThePointerInLevel, levelIndex);
-	size_t getParentIndex = GetParent(uniqueIndexOfThePointer);
-	size_t parentLevel = levelIndex - 1;
-	
 	// the pointer may be to a location, which is split, not used
 	bool a = uintptr_t(pointerToFree) >= (uintptr_t)(m_PointerToData);
 	bool b = (uintptr_t)(pointerToFree) < (uintptr_t)(m_PointerToData)+
 		(uintptr_t)(((MAX_LEVELS) * sizeof(PtrInt)) + 2 * (NUMBER_OF_BITSET_FOR_FREE_TABLE / 8));
 
 	if ((uintptr_t(pointerToFree) >= (uintptr_t)(m_PointerToData) &&
-		(uintptr_t)(pointerToFree) < (uintptr_t)(m_PointerToData) + 
-		(uintptr_t)(((MAX_LEVELS) * sizeof(PtrInt)) + 2*(NUMBER_OF_BITSET_FOR_FREE_TABLE / 8))))
+		(uintptr_t)(pointerToFree) < (uintptr_t)(m_PointerToData)+
+		(uintptr_t)(((MAX_LEVELS) * sizeof(PtrInt)) + 2 * (NUMBER_OF_BITSET_FOR_FREE_TABLE / 8))))
 	{
 		std::cout << "BuddyAllocator::Free(void*, size_t) address that was tasksed with freeing was allocator specific memory and therefore not freeable" << '\n';
 		return;
 	}
-	
-
 
 	// check if the level is right
 	if (levelIndex >= MAX_LEVELS)
@@ -292,13 +284,22 @@ void BuddyAllocator::Free(void* pointerToFree, size_t levelIndex)
 		return;
 	}
 
+
+	size_t uniqueIndexOfThePointer = GetUniqueIndex(pointerToFree, levelIndex);
+	
 	// check if the level points 
 	if (uniqueIndexOfThePointer < NUMBER_OF_BITSET_FOR_FREE_TABLE && GetBitFromSplitTable(uniqueIndexOfThePointer) == 1)
 	{
 		std::cerr << "BuddyAllocator::Free(void* pointerToFree, size_t levelIndex) m_SplitTable[uniqueIndexOfThePointer] = 1" << '\n';
 		return;
 	}
-
+	
+	size_t buddyIndexOfThePointerInLevel = GetBuddy(pointerToFree, levelIndex);
+	size_t buddyIndexOfThePointer = GetUniqueIndex(buddyIndexOfThePointerInLevel, levelIndex);
+	size_t getParentIndex = GetParent(uniqueIndexOfThePointer);
+	size_t parentLevel = levelIndex - 1;
+	
+	
 	while (true)
 	{
 		// the other buddy is free

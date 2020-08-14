@@ -3,6 +3,8 @@
 
 #include "FastLogarithm.h"
 
+#include <iostream>
+
 /*
 	totalSize = (1 << numberOfLevels) * leafSize
 	sizeOfEachBlockOnLevel(n) = totalSize / (1 << n)
