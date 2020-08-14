@@ -2,7 +2,6 @@
 #define BUDDYALLOCATOR_H_GUARD
 
 #include "FastLogarithm.h"
-#include <bitset>
 
 /*
 	totalSize = (1 << numberOfLevels) * leafSize
@@ -14,8 +13,8 @@
 	(1 << numberOfLevels) - 1 - number of indices
 */
 
-const uint64_t DEFAULT_BUDDY_ALLOCATOR_SIZE = 1 << 16;
-const uint64_t LEAF_SIZE = 1 << 7;
+const PtrInt DEFAULT_BUDDY_ALLOCATOR_SIZE = PtrInt(1) << 16;
+const PtrInt LEAF_SIZE = PtrInt(1) << 7;
 
 struct FreeListInformation
 {
@@ -31,6 +30,7 @@ struct BuddyAllocator
 private:
 	void SimulateAllocationForLeaves_ForFreeList(size_t numberOfAllocationsOnLeafsNeeded);
 
+public:
 	inline void SetBitToOne_FreeTable(const size_t parentIndex);
 	inline void SetBitToZero_FreeTable(const size_t parentIndex);
 	inline bool GetBitFromFreeTable(const size_t parentIndex);
@@ -50,9 +50,6 @@ public:
 	void* Allocate(size_t blockSize);
 
 private:
-	//void* m_FreeLists[MAX_LEVELS];
-	//std::bitset<NUMBER_OF_BITSET_FOR_FREE_TABLE> m_FreeTable;
-	//std::bitset<NUMBER_OF_BITSET_FOR_FREE_TABLE> m_SplitTable;
 	size_t m_NumberOfLevels = MAX_LEVELS;
 
 	unsigned char* m_PointerToData;
@@ -60,14 +57,14 @@ private:
 	inline size_t GetTotalSize() 
 	{
 		//return (1 << m_NumberOfLevels) * LEAF_SIZE;
-		return (1 << m_NumberOfLevels);
+		return (PtrInt(1) << m_NumberOfLevels);
 	}
 
 
 	// TotalSize / (2^levelIndex) = sizeOfEachBlockThere 
 	inline size_t GetSizeOfLevel(size_t n)
 	{
-		return GetTotalSize() / (1 << n);
+		return GetTotalSize() / (PtrInt(1) << n);
 	}
 
 	inline size_t GetLevel(size_t uniqueIndex)
@@ -90,6 +87,8 @@ private:
 
 	inline size_t IndexInLevelOf(void* pointer, size_t levelIndex)
 	{
+		// pointer substraction
+
 		unsigned char* getUnsignedCharPointer = static_cast<unsigned char*>(pointer);
 
 		size_t res = getUnsignedCharPointer - m_PointerToData;

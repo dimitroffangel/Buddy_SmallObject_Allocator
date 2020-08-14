@@ -137,6 +137,7 @@ void BuddyAllocator::SetBitToZero_SplitTable(const size_t parentIndex)
 	void* address = (m_PointerToData + ((highestLevel) * sizeof(PtrInt)) + (NUMBER_OF_BITSET_FOR_FREE_TABLE / 8) +
 		(sizeof(PtrInt) * ((parentIndex / sizeof(PtrInt)) / 8)));
 
+	bool test = *static_cast<PtrInt*>(address);
 	bool res1 = (*static_cast<PtrInt*>(address)) & (PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)));
 
 	(*static_cast<PtrInt*>(address)) &= ~(PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)));
@@ -216,9 +217,24 @@ void BuddyAllocator::Initialize()
 
 	for (size_t i = 0; i < NUMBER_OF_BITSET_FOR_FREE_TABLE; ++i)
 	{
-		SetBitToZero_FreeTable(i);
-		SetBitToZero_SplitTable(i);
+		void* freeTableAddress = (m_PointerToData + ((MAX_LEVELS) * sizeof(PtrInt)) + sizeof(PtrInt) * ((i / sizeof(PtrInt)) / 8));
+		void* splitTableAddress = (m_PointerToData + ((MAX_LEVELS) * sizeof(PtrInt)) + (NUMBER_OF_BITSET_FOR_FREE_TABLE / 8) +
+			(sizeof(PtrInt) * ((i / sizeof(PtrInt)) / 8)));
+
+
+		*static_cast<PtrInt*>(freeTableAddress) = 0;
+		*static_cast<PtrInt*>(splitTableAddress) = 0;
+
+
+		//SetBitToZero_FreeTable(i);
+		//SetBitToZero_SplitTable(i);
 	}
+
+	//for (size_t i = 0; i < NUMBER_OF_BITSET_FOR_FREE_TABLE; ++i)
+	//{
+	//	SetBitToZero_FreeTable(i);
+	//	SetBitToZero_SplitTable(i);
+	//}
 
 	size = size + (2 * NUMBER_OF_BITSET_FOR_FREE_TABLE / 8);
 
@@ -304,11 +320,21 @@ void BuddyAllocator::Free(void* pointerToFree, size_t levelIndex)
 
 			else
 			{
+				FreeListInformation* buddyFreeList = static_cast<FreeListInformation*>(buddyPointer);
+
 				((FreeListInformation*)(static_cast<FreeListInformation*>(buddyPointer)->previous))->next
 					= static_cast<FreeListInformation*>(buddyPointer)->next;
 
-				((FreeListInformation*)(static_cast<FreeListInformation*>(buddyPointer)->next))->previous
-					= static_cast<FreeListInformation*>(buddyPointer)->previous;
+				if (buddyFreeList->next != nullptr)
+				{
+					((FreeListInformation*)(static_cast<FreeListInformation*>(buddyPointer)->next))->previous
+						= static_cast<FreeListInformation*>(buddyPointer)->previous;
+				}
+				
+				else
+				{
+					int a = 42;
+				}
 			}
 
 			levelIndex = levelIndex - 1;
