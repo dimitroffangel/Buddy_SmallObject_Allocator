@@ -284,13 +284,19 @@ void BuddyAllocator::Free(void* pointerToFree, size_t levelIndex)
 		return;
 	}
 
-
 	size_t uniqueIndexOfThePointer = GetUniqueIndex(pointerToFree, levelIndex);
 	
 	// check if the level points 
 	if (uniqueIndexOfThePointer < NUMBER_OF_BITSET_FOR_FREE_TABLE && GetBitFromSplitTable(uniqueIndexOfThePointer) == 1)
 	{
 		std::cerr << "BuddyAllocator::Free(void* pointerToFree, size_t levelIndex) m_SplitTable[uniqueIndexOfThePointer] = 1" << '\n';
+		return;
+	}
+
+	// check pointer alignment
+	if (m_PointerToData + (GetSizeOfLevel(levelIndex) * IndexInLevel(uniqueIndexOfThePointer)) != pointerToFree)
+	{
+		std::cerr << "BuddyAllocator()::Free(void*, size_t) (PtrInt)(pointer) % sizeOfLevel != 0 " << '\n';
 		return;
 	}
 	

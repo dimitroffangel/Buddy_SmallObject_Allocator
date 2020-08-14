@@ -91,11 +91,38 @@ int main()
 		
 		foos[i]->~EpicFoo();
 
-		buddyAllocator.Free(foos[i], 24);
+		buddyAllocator.Free(foos[i], 9);
 
 		//smallObject.operator delete(foos[size - i - 1], sizeOfFoo);
 		//smallObject.operator delete(foos[i], sizeOfFoo);
 		
+
+		//std::cout << size - i - 1 << " " << foos[size - i - 1]->a << "\n" ;
+	}
+
+	for (size_t i = 0; i < 508; i++)
+	{
+		//void* rawPointer = smallObject.operator new(sizeOfFoo)
+		void* rawPointer = buddyAllocator.Allocate(sizeof(EpicFoo));
+
+		EpicFoo* result = new (rawPointer) EpicFoo();
+
+		foos.push_back(result);
+		//	Foo* result1 = new Foo();
+		//	foos.push_back(result1);
+	}
+
+	for (size_t i = 0; i < 508; i++)
+	{
+		//delete foos[i];
+
+		foos[i]->~EpicFoo();
+
+		buddyAllocator.Free(foos[i], 9);
+
+		//smallObject.operator delete(foos[size - i - 1], sizeOfFoo);
+		//smallObject.operator delete(foos[i], sizeOfFoo);
+
 
 		//std::cout << size - i - 1 << " " << foos[size - i - 1]->a << "\n" ;
 	}
