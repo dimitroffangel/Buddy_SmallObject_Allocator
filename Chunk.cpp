@@ -56,7 +56,7 @@ void* Chunk::Allocate(std::size_t blockSize)
 	return pointerResult;
 }
 
-void Chunk::Deallocate(void* deallocatePointer, std::size_t blockSize)
+void Chunk::Deallocate(void* deallocatePointer, size_t blockSize, const unsigned char numberOfBlocks)
 {
 	if(deallocatePointer == nullptr)
 	{
@@ -64,7 +64,12 @@ void Chunk::Deallocate(void* deallocatePointer, std::size_t blockSize)
 		return;
 	}
 
-	assert(deallocatePointer >= m_PointerToData);
+	if (!((uintptr_t)(deallocatePointer) >= (uintptr_t)(m_PointerToData) &&
+		(uintptr_t)(deallocatePointer) < (uintptr_t)(m_PointerToData)+ (uintptr_t)(blockSize * numberOfBlocks)))
+	{
+		std::cerr << "Chunk::Deallocate pointer is off the range of the Chunk" << '\n';
+		return;
+	}
 
 	unsigned char* toReleasePointer = static_cast<unsigned char*>(deallocatePointer);
 

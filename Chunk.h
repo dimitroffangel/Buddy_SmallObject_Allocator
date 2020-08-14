@@ -15,7 +15,7 @@ struct Chunk
 	void Release();
 	void Reset(std::size_t blockSize, unsigned char numberOfBlocks);
 	void* Allocate(std::size_t blockSize);
-	void Deallocate(void* pointer, std::size_t blockSize);
+	void Deallocate(void* pointer, const std::size_t blockSize, const unsigned char numberOfBlocks);
 	unsigned char* m_PointerToData;
 	unsigned char
 		m_FirstAvailableBlock,

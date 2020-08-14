@@ -273,6 +273,13 @@ void BuddyAllocator::Shutdown()
 
 void BuddyAllocator::Deallocate(void* pointer, size_t blockSize)
 {
+	if (blockSize < LEAF_SIZE)
+	{
+		g_SmallObjectAllocator->Deallocate(pointer, blockSize);
+
+		return;
+	}
+
 	size_t level = MAX_LEVELS - FastLogarithm::Log2_64(blockSize) - !FastOperationsWithTwo::IsPowerOfTwo(blockSize);
 	Free(pointer, level);
 }
@@ -473,14 +480,14 @@ void BuddyAllocator::Free(void* pointerToFree)
 		(uintptr_t)(pointerToFree) < (uintptr_t)(m_PointerToData)+
 		(uintptr_t)(((MAX_LEVELS) * sizeof(PtrInt)) + 2 * (NUMBER_OF_BITSET_FOR_FREE_TABLE / 8))))
 	{
-		std::cout << "BuddyAllocator::Free(void*) address that was tasked with freeing was allocator specific memory and therefore not freeable" << '\n';
+		//std::cout << "BuddyAllocator::Free(void*) address that was tasked with freeing was allocator specific memory and therefore not freeable" << '\n';
 		return;
 	}
 
 	if (!((uintptr_t)(pointerToFree) >= (uintptr_t)(m_PointerToData) &&
 		(uintptr_t)(pointerToFree) < (uintptr_t)(m_PointerToData)+(uintptr_t)(GetTotalSize())))
 	{
-		std::cerr << "BuddyAllocator::Free(void*) pointer was out of range" << '\n';
+		//std::cerr << "BuddyAllocator::Free(void*) pointer was out of range" << '\n';
 		return;
 	}
 
@@ -517,13 +524,13 @@ void* BuddyAllocator::Allocate(size_t blockSize)
 {
 	if (blockSize < LEAF_SIZE)
 	{
-		std::cout << "Size is less than the minimum..." << '\n';
+		//std::cout << "Size is less than the minimum..." << '\n';
 		return g_SmallObjectAllocator->Allocate(blockSize);
 	}
 
 	if (blockSize > DEFAULT_BUDDY_ALLOCATOR_SIZE)
 	{
-		std::cout << "Size is bigger than the allocated block..." << '\n';
+		//std::cout << "Size is bigger than the allocated block..." << '\n';
 		return operator new(blockSize);
 	}
 

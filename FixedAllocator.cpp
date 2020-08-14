@@ -92,7 +92,7 @@ void FixedAllocator::DoDeallocation(void* pointer)
 	assert(m_RecentlyDeallocatedChunk->m_PointerToData <= pointer);
 	assert(m_RecentlyDeallocatedChunk->m_PointerToData + (m_NumberOfBlocks * m_BlockSize) > pointer);
 
-	m_RecentlyDeallocatedChunk->Deallocate(pointer, m_BlockSize);
+	m_RecentlyDeallocatedChunk->Deallocate(pointer, m_BlockSize, m_NumberOfBlocks);
 
 	if (m_RecentlyDeallocatedChunk->m_BlockAvailable == m_NumberOfBlocks)
 	{

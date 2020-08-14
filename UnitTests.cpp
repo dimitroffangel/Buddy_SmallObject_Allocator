@@ -194,7 +194,7 @@ void UnitTests::Allocate_Via_Buddy_AllObjects_Add_Delete(const BuddyAllocatorObj
 		foos.push_back(result);
 
 		foos[i]->~Foo();
-		buddyAllocator.operator delete(foos[i]);
+		buddyAllocator.operator delete(foos[i], sizeof(Foo));
 
 		void* rawPointer2 = buddyAllocator.operator new(sizeof(GiantFoo));
 
@@ -203,7 +203,7 @@ void UnitTests::Allocate_Via_Buddy_AllObjects_Add_Delete(const BuddyAllocatorObj
 		giantFoos.push_back(res2);
 
 		giantFoos[i]->~GiantFoo();
-		buddyAllocator.operator delete(giantFoos[i]);
+		buddyAllocator.operator delete(giantFoos[i], sizeof(GiantFoo));
 
 
 		void* rawPointer3 = buddyAllocator.operator new(sizeof(EpicFoo));
@@ -348,7 +348,7 @@ void UnitTests::Allocate_Via_Slab_SmallObjects_Add_Delete(const BuddyAllocatorOb
 
 		foos[i]->~Foo();
 
-		smallObject.operator delete(foos[size - i - 1], sizeof(Foo));
+		smallObject.operator delete(foos[i], sizeof(Foo));
 	}
 
 	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
