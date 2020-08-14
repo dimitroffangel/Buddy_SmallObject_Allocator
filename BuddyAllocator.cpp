@@ -176,7 +176,7 @@ inline void BuddyAllocator::XOR_Bit_SplitTable(const size_t parentIndex, const b
 	bool res = GetBitFromSplitTable(parentIndex);
 }
 
-void BuddyAllocator::Initialize()
+BuddyAllocator::BuddyAllocator()
 {
 	m_PointerToData = new unsigned char[DEFAULT_BUDDY_ALLOCATOR_SIZE];
 
@@ -198,7 +198,7 @@ void BuddyAllocator::Initialize()
 
 	//	*static_cast<PtrInt*>(startOfTheListInformationPointers) = (PtrInt)(nullptr);
 	//}
-	
+
 	{
 		*((PtrInt*)(m_PointerToData)) = (PtrInt)(m_PointerToData);
 
@@ -238,12 +238,35 @@ void BuddyAllocator::Initialize()
 
 	size = size + (2 * NUMBER_OF_BITSET_FOR_FREE_TABLE / 8);
 
-	size_t numberOfAllocationsOnLeafsNeeded = 
+	size_t numberOfAllocationsOnLeafsNeeded =
 		(size) / LEAF_SIZE + !(size % LEAF_SIZE == 0);
 
 	SimulateAllocationForLeaves_ForFreeList(numberOfAllocationsOnLeafsNeeded);
-	
+
 	int test = 42;
+}
+
+BuddyAllocator::~BuddyAllocator()
+{
+	delete[] m_PointerToData;
+}
+
+BuddyAllocator* g_BuddyAllocator = nullptr;
+
+void BuddyAllocator::Initialize()
+{
+	g_BuddyAllocator = new BuddyAllocator();
+}
+
+void BuddyAllocator::Shutdown()
+{
+	delete g_BuddyAllocator;
+}
+
+void BuddyAllocator::Deallocate(void* pointer, size_t blockSize)
+{
+	size_t level = MAX_LEVELS - FastLogarithm::Log2_64(blockSize);
+	Free(pointer, level);
 }
 
 void BuddyAllocator::Free(void* pointerToFree, size_t levelIndex)

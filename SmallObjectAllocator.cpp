@@ -86,7 +86,6 @@ SmallObjectAllocator* g_SmallObjectAllocator = nullptr;
 void SmallObjectAllocator::Initialize()
 {
 	g_SmallObjectAllocator = new SmallObjectAllocator(DEFAULT_CHUNK_SIZE, MAX_SMALL_OBJECT_SIZE);
-
 }
 
 void SmallObjectAllocator::Initialize(const int chunkSize, const int maxSmallObjectSize)

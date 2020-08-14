@@ -4,6 +4,7 @@
 
 #include "SmallObject.h"
 #include "BuddyAllocator.h"
+#include "BuddyAllocatorObject.h"
 
 class Foo
 {
@@ -52,46 +53,43 @@ void ShutdownSystems()
 	SmallObjectAllocator::Shutdown();
 }
 
-
-
 int main()
 {	
-	SmallObjectAllocator::Initialize();
+	//SmallObjectAllocator::Initialize();
+	BuddyAllocator::Initialize();
 
 	const int blocks = 4;
 	int sizeOfFoo = sizeof(Foo);
 	int sizeOfEpicFoo = sizeof(EpicFoo);
 
-	SmallObject smallObject;
-	BuddyAllocator buddyAllocator;
-	PtrInt res = (PtrInt(1) << 32) / (PtrInt(128));
+	//SmallObject smallObject;
+	BuddyAllocatorObject buddyAllocator;
 
-	buddyAllocator.Initialize();
 
 	const int size = 1000000;
 
 	std::vector<EpicFoo*> foos;
 	foos.reserve(size);
 
-	for (size_t i = 0; i < 508; i++)
+	for (size_t i = 0; i < size; i++)
 	{
 		//void* rawPointer = smallObject.operator new(sizeOfFoo)
-		void* rawPointer = buddyAllocator.Allocate(sizeof(EpicFoo));
+		void* rawPointer = buddyAllocator.operator new(sizeof(EpicFoo));
 
 		EpicFoo* result = new (rawPointer) EpicFoo();
 		
 		foos.push_back(result);
-	//	Foo* result1 = new Foo();
-	//	foos.push_back(result1);
+		//EpicFoo* result1 = new EpicFoo();
+		//foos.push_back(result1);
 	}
 
-	for (size_t i = 0; i < 508; i++)
+	for (size_t i = 0; i < size; i++)
 	{
 		//delete foos[i];
 		
 		foos[i]->~EpicFoo();
 
-		buddyAllocator.Free(foos[i], 9);
+		buddyAllocator.operator delete(foos[i], sizeof(EpicFoo));
 
 		//smallObject.operator delete(foos[size - i - 1], sizeOfFoo);
 		//smallObject.operator delete(foos[i], sizeOfFoo);
@@ -100,34 +98,8 @@ int main()
 		//std::cout << size - i - 1 << " " << foos[size - i - 1]->a << "\n" ;
 	}
 
-	for (size_t i = 0; i < 508; i++)
-	{
-		//void* rawPointer = smallObject.operator new(sizeOfFoo)
-		void* rawPointer = buddyAllocator.Allocate(sizeof(EpicFoo));
-
-		EpicFoo* result = new (rawPointer) EpicFoo();
-
-		foos.push_back(result);
-		//	Foo* result1 = new Foo();
-		//	foos.push_back(result1);
-	}
-
-	for (size_t i = 0; i < 508; i++)
-	{
-		//delete foos[i];
-
-		foos[i]->~EpicFoo();
-
-		buddyAllocator.Free(foos[i], 9);
-
-		//smallObject.operator delete(foos[size - i - 1], sizeOfFoo);
-		//smallObject.operator delete(foos[i], sizeOfFoo);
-
-
-		//std::cout << size - i - 1 << " " << foos[size - i - 1]->a << "\n" ;
-	}
-
-	SmallObjectAllocator::Shutdown();
+	//SmallObjectAllocator::Shutdown();
+	BuddyAllocator::Shutdown();
 
 	return 0;
 }
