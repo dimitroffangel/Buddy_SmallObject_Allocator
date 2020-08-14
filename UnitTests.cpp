@@ -84,63 +84,6 @@ void UnitTests::Allocate_Via_Buddy_SmallObjects_Add_Delete(const BuddyAllocatorO
 	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << '\n';
 }
 
-void UnitTests::Allocate_Via_Buddy_AllObjects_Add_Delete(const BuddyAllocatorObject& buddyAllocator,const SmallObject& smallObject)
-{
-	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-
-	const int blocks = 4;
-	const size_t sizeOfPtrInt = sizeof(PtrInt);
-	const size_t sizeOfFoo = sizeof(Foo);
-	const size_t sizeOfEpicFoo = sizeof(EpicFoo);
-	const size_t sizeofGiantFoo = sizeof(GiantFoo);
-
-	const int size = 10000;
-
-	std::vector<Foo*> foos;
-	foos.reserve(size);
-
-	std::vector<GiantFoo*> giantFoos;
-	giantFoos.reserve(size);
-
-	std::vector<EpicFoo*> epicFoos;
-	epicFoos.reserve(size);
-
-	for (size_t i = 0; i < size; i++)
-	{
-		//void* rawPointer = smallObject.operator new(sizeOfFoo);
-		void* rawPointer = buddyAllocator.operator new(sizeof(Foo));
-
-		Foo* result = new (rawPointer) Foo();
-
-		foos.push_back(result);
-
-		foos[i]->~Foo();
-		buddyAllocator.operator delete(foos[i]);
-
-		void* rawPointer2 = buddyAllocator.operator new(sizeof(GiantFoo));
-
-		GiantFoo* res2 = new (rawPointer2) GiantFoo();
-
-		giantFoos.push_back(res2);
-
-		giantFoos[i]->~GiantFoo();
-		buddyAllocator.operator delete(giantFoos[i]);
-
-
-		void* rawPointer3 = buddyAllocator.operator new(sizeof(EpicFoo));
-
-		EpicFoo* res3 = new (rawPointer2) EpicFoo();
-
-		epicFoos.push_back(res3);
-
-		epicFoos[i]->~EpicFoo();
-		buddyAllocator.operator delete(epicFoos[i]);
-	}
-
-	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << '\n';
-}
-
 void UnitTests::Allocate_Via_Buddy_BigObjects(const BuddyAllocatorObject& buddyAllocator, const SmallObject& smallObject)
 {
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
@@ -220,6 +163,63 @@ void UnitTests::Allocate_Via_Buddy_BigObjects_Add_Delete(const BuddyAllocatorObj
 	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << '\n';
 }
 
+void UnitTests::Allocate_Via_Buddy_AllObjects_Add_Delete(const BuddyAllocatorObject& buddyAllocator, const SmallObject& smallObject)
+{
+	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+
+	const int blocks = 4;
+	const size_t sizeOfPtrInt = sizeof(PtrInt);
+	const size_t sizeOfFoo = sizeof(Foo);
+	const size_t sizeOfEpicFoo = sizeof(EpicFoo);
+	const size_t sizeofGiantFoo = sizeof(GiantFoo);
+
+	const int size = 10000;
+
+	std::vector<Foo*> foos;
+	foos.reserve(size);
+
+	std::vector<GiantFoo*> giantFoos;
+	giantFoos.reserve(size);
+
+	std::vector<EpicFoo*> epicFoos;
+	epicFoos.reserve(size);
+
+	for (size_t i = 0; i < size; i++)
+	{
+		//void* rawPointer = smallObject.operator new(sizeOfFoo);
+		void* rawPointer = buddyAllocator.operator new(sizeof(Foo));
+
+		Foo* result = new (rawPointer) Foo();
+
+		foos.push_back(result);
+
+		foos[i]->~Foo();
+		buddyAllocator.operator delete(foos[i]);
+
+		void* rawPointer2 = buddyAllocator.operator new(sizeof(GiantFoo));
+
+		GiantFoo* res2 = new (rawPointer2) GiantFoo();
+
+		giantFoos.push_back(res2);
+
+		giantFoos[i]->~GiantFoo();
+		buddyAllocator.operator delete(giantFoos[i]);
+
+
+		void* rawPointer3 = buddyAllocator.operator new(sizeof(EpicFoo));
+
+		EpicFoo* res3 = new (rawPointer2) EpicFoo();
+
+		epicFoos.push_back(res3);
+
+		epicFoos[i]->~EpicFoo();
+		buddyAllocator.operator delete(epicFoos[i]);
+	}
+
+	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << '\n';
+}
+
 void UnitTests::Allocate_Via_Buddy_RandomObject_DeleteRandomPosition(const BuddyAllocatorObject& buddyAllocator, const SmallObject& smallObject)
 {	
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
@@ -267,13 +267,13 @@ void UnitTests::Allocate_Via_Buddy_RandomObject_DeleteRandomPosition(const Buddy
 	for (size_t i = 0; i < size; ++i)
 	{
 		foos[i]->~Foo();
-		buddyAllocator.operator delete(foos[i]);
+		buddyAllocator.operator delete(foos[i], sizeof(Foo));
 
 		epicFoos[i]->~EpicFoo();
-		buddyAllocator.operator delete(epicFoos[i]);
+		buddyAllocator.operator delete(epicFoos[i], sizeof(EpicFoo));
 
 		giantFoos[i]->~GiantFoo();
-		buddyAllocator.operator delete(giantFoos[i]);
+		buddyAllocator.operator delete(giantFoos[i], sizeof(GiantFoo));
 	}
 
 	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
@@ -348,7 +348,204 @@ void UnitTests::Allocate_Via_Slab_SmallObjects_Add_Delete(const BuddyAllocatorOb
 
 		foos[i]->~Foo();
 
-		smallObject.operator delete(foos[size - i - 1], sizeof(EpicFoo));
+		smallObject.operator delete(foos[size - i - 1], sizeof(Foo));
+	}
+
+	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << '\n';
+}
+
+void UnitTests::Allocate_Via_Slab_BigObjects(const BuddyAllocatorObject&, const SmallObject& smallObject)
+{
+	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+
+	const int blocks = 4;
+	const size_t sizeOfPtrInt = sizeof(PtrInt);
+	const size_t sizeOfFoo = sizeof(Foo);
+	const size_t sizeOfEpicFoo = sizeof(EpicFoo);
+	const size_t sizeofGiantFoo = sizeof(GiantFoo);
+
+	const int size = 10000;
+
+	std::vector<GiantFoo*> foos;
+	foos.reserve(size);
+
+	for (size_t i = 0; i < size; i++)
+	{
+		//void* rawPointer = smallObject.operator new(sizeOfFoo);
+		void* rawPointer = smallObject.operator new(sizeof(GiantFoo));
+
+		GiantFoo* result = new (rawPointer) GiantFoo();
+
+		foos.push_back(result);
+		//EpicFoo* result1 = new EpicFoo();
+		//foos.push_back(result1);
+	}
+
+
+	for (size_t i = 0; i < size; i++)
+	{
+		//delete foos[i];
+
+		foos[i]->~GiantFoo();
+
+		smallObject.operator delete(foos[size - i - 1], sizeof(GiantFoo));
+
+		//smallObject.operator delete(foos[size - i - 1], sizeOfFoo);
+		//smallObject.operator delete(foos[i], sizeOfFoo);
+
+		//std::cout << size - i - 1 << " " << foos[size - i - 1]->a << "\n" ;
+	}
+
+	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << '\n';
+
+}
+
+void UnitTests::Allocate_Via_Slab_BigObjects_Add_Delete(const BuddyAllocatorObject&, const SmallObject& smallObject)
+{
+	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+
+	const int blocks = 4;
+	const size_t sizeOfPtrInt = sizeof(PtrInt);
+	const size_t sizeOfFoo = sizeof(Foo);
+	const size_t sizeOfEpicFoo = sizeof(EpicFoo);
+	const size_t sizeofGiantFoo = sizeof(GiantFoo);
+
+	const int size = 10000;
+
+	std::vector<GiantFoo*> foos;
+	foos.reserve(size);
+
+	for (size_t i = 0; i < size; i++)
+	{
+		//void* rawPointer = smallObject.operator new(sizeOfFoo);
+		void* rawPointer = smallObject.operator new(sizeof(GiantFoo));
+
+		GiantFoo* result = new (rawPointer) GiantFoo();
+
+		foos.push_back(result);
+
+		foos[i]->~GiantFoo();
+		smallObject.operator delete(foos[size - i - 1], sizeof(GiantFoo));
+	}
+
+
+	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << '\n';
+}
+
+void UnitTests::Allocate_Via_Slab_RandomObject_DeleteRandomPosition(const BuddyAllocatorObject&, const SmallObject& smallObject)
+{
+	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+
+	const int blocks = 4;
+	const size_t sizeOfPtrInt = sizeof(PtrInt);
+	const size_t sizeOfFoo = sizeof(Foo);
+	const size_t sizeOfEpicFoo = sizeof(EpicFoo);
+	const size_t sizeofGiantFoo = sizeof(GiantFoo);
+
+	const int size = 10000;
+
+	std::vector<Foo*> foos;
+	foos.reserve(size);
+
+	std::vector<GiantFoo*> giantFoos;
+	giantFoos.reserve(size);
+
+	std::vector<EpicFoo*> epicFoos;
+	epicFoos.reserve(size);
+
+	for (size_t i = 0; i < size; i++)
+	{
+		//void* rawPointer = smallObject.operator new(sizeOfFoo);
+		void* rawPointer = smallObject.operator new(sizeof(EpicFoo));
+
+		Foo* result = new (rawPointer) Foo();
+
+		foos.push_back(result);
+
+
+		void* rawPointer2 = smallObject.operator new(sizeof(GiantFoo));
+
+		GiantFoo* res2 = new (rawPointer2) GiantFoo();
+
+		giantFoos.push_back(res2);
+
+		void* rawPointer3 = smallObject.operator new(sizeof(EpicFoo));
+
+		EpicFoo* res3 = new (rawPointer2) EpicFoo();
+
+		epicFoos.push_back(res3);
+	}
+
+	for (size_t i = 0; i < size; ++i)
+	{
+		foos[i]->~Foo();
+		smallObject.operator delete(foos[i], sizeof(Foo));
+
+		epicFoos[i]->~EpicFoo();
+		smallObject.operator delete(epicFoos[i], sizeof(EpicFoo));
+
+		giantFoos[i]->~GiantFoo();
+		smallObject.operator delete(giantFoos[i], sizeof(GiantFoo));
+	}
+
+	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << '\n';
+
+}
+
+void UnitTests::Allocate_Via_Slab_AllObjects_Add_Delete(const BuddyAllocatorObject&, const SmallObject& smallObject)
+{
+	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+
+	const int blocks = 4;
+	const size_t sizeOfPtrInt = sizeof(PtrInt);
+	const size_t sizeOfFoo = sizeof(Foo);
+	const size_t sizeOfEpicFoo = sizeof(EpicFoo);
+	const size_t sizeofGiantFoo = sizeof(GiantFoo);
+
+	const int size = 10000;
+
+	std::vector<Foo*> foos;
+	foos.reserve(size);
+
+	std::vector<GiantFoo*> giantFoos;
+	giantFoos.reserve(size);
+
+	std::vector<EpicFoo*> epicFoos;
+	epicFoos.reserve(size);
+
+	for (size_t i = 0; i < size; i++)
+	{
+		void* rawPointer = smallObject.operator new(sizeOfFoo);
+		
+		Foo* result = new (rawPointer) Foo();
+
+		foos.push_back(result);
+
+		foos[i]->~Foo();
+		smallObject.operator delete(foos[i], sizeof(Foo));
+
+		void* rawPointer2 = smallObject.operator new(sizeof(GiantFoo));
+
+		GiantFoo* res2 = new (rawPointer2) GiantFoo();
+
+		giantFoos.push_back(res2);
+
+		giantFoos[i]->~GiantFoo();
+		smallObject.operator delete(giantFoos[i], sizeofGiantFoo);
+
+
+		void* rawPointer3 = smallObject.operator new(sizeof(EpicFoo));
+
+		EpicFoo* res3 = new (rawPointer2) EpicFoo();
+
+		epicFoos.push_back(res3);
+
+		epicFoos[i]->~EpicFoo();
+		smallObject.operator delete(epicFoos[i], sizeof(EpicFoo));
 	}
 
 	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
