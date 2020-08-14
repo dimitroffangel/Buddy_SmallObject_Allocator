@@ -534,7 +534,7 @@ void* BuddyAllocator::Allocate(size_t blockSize)
 		return operator new(blockSize);
 	}
 
-	size_t initialLevel = m_NumberOfLevels - FastLogarithm::Log2_64(blockSize) - !FastOperationsWithTwo::IsPowerOfTwo(blockSize);
+	size_t initialLevel = MAX_LEVELS - FastLogarithm::Log2_64(blockSize) - !FastOperationsWithTwo::IsPowerOfTwo(blockSize);
 
 	size_t levelSize = GetSizeOfLevel(initialLevel);
 	int level = initialLevel;
@@ -583,7 +583,7 @@ void* BuddyAllocator::Allocate(size_t blockSize)
 				{
 					size_t uniqueIndexOfTheFreeSlot = GetUniqueIndex(freeSlot, level);
 
-					assert(level <= m_NumberOfLevels - FastLogarithm::Log2_64(LEAF_SIZE));
+					assert(level <= MAX_LEVELS - FastLogarithm::Log2_64(LEAF_SIZE));
 					assert(GetBitFromSplitTable(uniqueIndexOfTheFreeSlot) == 0);
 
 					SetBitToOne_SplitTable(uniqueIndexOfTheFreeSlot);

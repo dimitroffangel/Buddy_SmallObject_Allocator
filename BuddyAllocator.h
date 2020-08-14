@@ -59,14 +59,14 @@ public:
 	void* Allocate(size_t blockSize);
 	
 public:
-	size_t m_NumberOfLevels = MAX_LEVELS;
+	//size_t m_NumberOfLevels = MAX_LEVELS;
 
 	unsigned char* m_PointerToData;
 	
 	inline size_t GetTotalSize() 
 	{
 		//return (1 << m_NumberOfLevels) * LEAF_SIZE;
-		return (PtrInt(1) << m_NumberOfLevels);
+		return (PtrInt(1) << MAX_LEVELS);
 	}
 
 	// TotalSize / (2^levelIndex) = sizeOfEachBlockThere 
