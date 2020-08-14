@@ -82,7 +82,7 @@ public:
 	inline size_t IndexInLevel(size_t uniqueIndex)
 	{
 		size_t levelOfIndex = GetLevel(uniqueIndex);
-		size_t firstUniqueIndexOnLevel = ((PtrInt)1 << levelOfIndex) - 1;
+		size_t firstUniqueIndexOnLevel = (PtrInt(1) << levelOfIndex) - 1;
 
 		return uniqueIndex - firstUniqueIndexOnLevel;
 	}
@@ -90,9 +90,8 @@ public:
 	inline size_t IndexInLevelOf(void* pointer, size_t levelIndex)
 	{
 		// pointer substraction
-
-		if (!((uintptr_t)(pointer) >= (uintptr_t)m_PointerToData &&
-			(uintptr_t)(pointer) < (uintptr_t)(pointer)+(uintptr_t)(GetTotalSize())))
+		if (!((uintptr_t)(pointer) >= (uintptr_t)(m_PointerToData) &&
+			(uintptr_t)(pointer) < (uintptr_t)(m_PointerToData)+(uintptr_t)(GetTotalSize())))
 		{
 			std::cerr << "BuddyAllocator()::IndexInLevelOf(void*, size_t) pointer was out of range" << '\n';
 			return 0;
@@ -113,7 +112,7 @@ public:
 			uniqueIndex = indexInLevelOfThePointer + firstUniqueIndexOnLevel
 		*/ 
 		
-		size_t firstUniqueIndexOnLevel = ((PtrInt)1 << levelIndex) - 1;
+		size_t firstUniqueIndexOnLevel = (PtrInt(1) << levelIndex) - 1;
 	
 		size_t indexInLevelOfThePointer = IndexInLevelOf(pointer, levelIndex);
 	

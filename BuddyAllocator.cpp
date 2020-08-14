@@ -273,7 +273,7 @@ void BuddyAllocator::Free(void* pointerToFree, size_t levelIndex)
 		(uintptr_t)(pointerToFree) < (uintptr_t)(m_PointerToData)+
 		(uintptr_t)(((MAX_LEVELS) * sizeof(PtrInt)) + 2 * (NUMBER_OF_BITSET_FOR_FREE_TABLE / 8))))
 	{
-		std::cout << "BuddyAllocator::Free(void*, size_t) address that was tasksed with freeing was allocator specific memory and therefore not freeable" << '\n';
+		std::cout << "BuddyAllocator::Free(void*, size_t) address that was tasked with freeing was allocator specific memory and therefore not freeable" << '\n';
 		return;
 	}
 
@@ -420,7 +420,7 @@ void BuddyAllocator::Free(void* pointerToFree, size_t levelIndex)
 	}
 }
 
-void BuddyAllocator::Free(void* pointer)
+void BuddyAllocator::Free(void* pointerToFree)
 {
 	//// assert that the pointer is in the range
 
@@ -444,7 +444,52 @@ void BuddyAllocator::Free(void* pointer)
 	//	}
 
 
-	//}
+	if (pointerToFree == nullptr)
+	{
+		return;
+	}
+
+
+	// the pointer may be to a location, which is split, not used
+	bool a = uintptr_t(pointerToFree) >= (uintptr_t)(m_PointerToData);
+	bool b = (uintptr_t)(pointerToFree) < (uintptr_t)(m_PointerToData)+
+		(uintptr_t)(((MAX_LEVELS) * sizeof(PtrInt)) + 2 * (NUMBER_OF_BITSET_FOR_FREE_TABLE / 8));
+
+	if ((uintptr_t(pointerToFree) >= (uintptr_t)(m_PointerToData) &&
+		(uintptr_t)(pointerToFree) < (uintptr_t)(m_PointerToData)+
+		(uintptr_t)(((MAX_LEVELS) * sizeof(PtrInt)) + 2 * (NUMBER_OF_BITSET_FOR_FREE_TABLE / 8))))
+	{
+		std::cout << "BuddyAllocator::Free(void*) address that was tasked with freeing was allocator specific memory and therefore not freeable" << '\n';
+		return;
+	}
+
+	if (!((uintptr_t)(pointerToFree) >= (uintptr_t)(m_PointerToData) &&
+		(uintptr_t)(pointerToFree) < (uintptr_t)(m_PointerToData)+(uintptr_t)(GetTotalSize())))
+	{
+		std::cerr << "BuddyAllocator::Free(void*) pointer was out of range" << '\n';
+		return;
+	}
+
+	int initialLevel = 0;
+
+	while (true)
+	{
+		size_t uniqueIndex = GetUniqueIndex(pointerToFree, initialLevel);
+		
+		if (GetBitFromSplitTable(uniqueIndex) == 1)
+		{
+			++initialLevel;
+		}
+
+		else
+		{
+			size_t parentIndex = GetParent(uniqueIndex);
+			assert(GetBitFromFreeTable(parentIndex) == 1);
+			break;
+		}
+	}
+
+	Free(pointerToFree, initialLevel);
 }
 
 void* BuddyAllocator::Allocate(size_t blockSize)
