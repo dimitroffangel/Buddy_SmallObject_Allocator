@@ -249,7 +249,6 @@ void UnitTests::Allocate_Via_Buddy_RandomObject_DeleteRandomPosition(const Buddy
 		EpicFoo* result = new (rawPointer) EpicFoo();
 
 		epicFoos.push_back(result);
-
 		
 		void* rawPointer2 = buddyAllocator.operator new(sizeof(GiantFoo));
 
@@ -259,7 +258,7 @@ void UnitTests::Allocate_Via_Buddy_RandomObject_DeleteRandomPosition(const Buddy
 
 		void* rawPointer3 = buddyAllocator.operator new(sizeof(Foo));
 
-		Foo* res3 = new (rawPointer2) Foo();
+		Foo* res3 = new (rawPointer3) Foo();
 
 		foos.push_back(res3);
 	}
@@ -474,7 +473,7 @@ void UnitTests::Allocate_Via_Slab_RandomObject_DeleteRandomPosition(const BuddyA
 
 		void* rawPointer3 = smallObject.operator new(sizeof(EpicFoo));
 
-		EpicFoo* res3 = new (rawPointer2) EpicFoo();
+		EpicFoo* res3 = new (rawPointer3) EpicFoo();
 
 		epicFoos.push_back(res3);
 	}
