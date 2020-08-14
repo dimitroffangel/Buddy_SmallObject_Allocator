@@ -273,7 +273,7 @@ void BuddyAllocator::Shutdown()
 
 void BuddyAllocator::Deallocate(void* pointer, size_t blockSize)
 {
-	size_t level = MAX_LEVELS - FastLogarithm::Log2_64(blockSize);
+	size_t level = MAX_LEVELS - FastLogarithm::Log2_64(blockSize) - !FastOperationsWithTwo::IsPowerOfTwo(blockSize);
 	Free(pointer, level);
 }
 
@@ -486,7 +486,7 @@ void BuddyAllocator::Free(void* pointerToFree)
 
 	int initialLevel = 0;
 
-	const size_t highestLevel = m_NumberOfLevels - FastLogarithm::Log2_64(LEAF_SIZE);
+	const size_t highestLevel = MAX_LEVELS - FastLogarithm::Log2_64(LEAF_SIZE);
 
 	while (initialLevel < highestLevel)
 	{
@@ -527,7 +527,7 @@ void* BuddyAllocator::Allocate(size_t blockSize)
 		return operator new(blockSize);
 	}
 
-	size_t initialLevel = m_NumberOfLevels - FastLogarithm::Log2_64(blockSize) + !FastOperationsWithTwo::IsPowerOfTwo(blockSize);
+	size_t initialLevel = m_NumberOfLevels - FastLogarithm::Log2_64(blockSize) - !FastOperationsWithTwo::IsPowerOfTwo(blockSize);
 
 	size_t levelSize = GetSizeOfLevel(initialLevel);
 	int level = initialLevel;

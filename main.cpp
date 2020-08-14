@@ -14,9 +14,9 @@ int main()
 
 	UnitTests unitTests;
 
-	unitTests.Allocate_Via_Buddy_SmallObjects(buddyAllocator, smallObject);
+	unitTests.Allocate_Via_Buddy_BigObjects(buddyAllocator, smallObject);
 
-	unitTests.Allocate_Via_Default_SmallObjects();
+	unitTests.Allocate_Via_Default_BigObjects();
 
 	SmallObjectAllocator::Shutdown();
 	BuddyAllocator::Shutdown();

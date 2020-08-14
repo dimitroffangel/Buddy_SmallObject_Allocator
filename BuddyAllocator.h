@@ -39,11 +39,8 @@ public:
 
 	static void Shutdown();
 
-
 private:
 	void SimulateAllocationForLeaves_ForFreeList(size_t numberOfAllocationsOnLeafsNeeded);
-
-public:
 	inline void SetBitToOne_FreeTable(const size_t parentIndex);
 	inline void SetBitToZero_FreeTable(const size_t parentIndex);
 	inline bool GetBitFromFreeTable(const size_t parentIndex);

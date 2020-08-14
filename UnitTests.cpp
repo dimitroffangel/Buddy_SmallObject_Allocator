@@ -118,7 +118,7 @@ void UnitTests::Allocate_Via_Buddy_BigObjects(const BuddyAllocatorObject& buddyA
 
 		foos[i]->~GiantFoo();
 
-		buddyAllocator.operator delete(foos[size - i - 1], sizeof(EpicFoo));
+		buddyAllocator.operator delete(foos[size - i - 1], sizeof(GiantFoo));
 
 		//smallObject.operator delete(foos[size - i - 1], sizeOfFoo);
 		//smallObject.operator delete(foos[i], sizeOfFoo);
@@ -213,7 +213,7 @@ void UnitTests::Allocate_Via_Buddy_AllObjects_Add_Delete(const BuddyAllocatorObj
 		epicFoos.push_back(res3);
 
 		epicFoos[i]->~EpicFoo();
-		buddyAllocator.operator delete(epicFoos[i]);
+		buddyAllocator.operator delete(epicFoos[i], sizeof(EpicFoo));
 	}
 
 	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
@@ -246,9 +246,9 @@ void UnitTests::Allocate_Via_Buddy_RandomObject_DeleteRandomPosition(const Buddy
 		//void* rawPointer = smallObject.operator new(sizeOfFoo);
 		void* rawPointer = buddyAllocator.operator new(sizeof(EpicFoo));
 
-		Foo* result = new (rawPointer) Foo();
+		EpicFoo* result = new (rawPointer) EpicFoo();
 
-		foos.push_back(result);
+		epicFoos.push_back(result);
 
 		
 		void* rawPointer2 = buddyAllocator.operator new(sizeof(GiantFoo));
@@ -257,11 +257,11 @@ void UnitTests::Allocate_Via_Buddy_RandomObject_DeleteRandomPosition(const Buddy
 
 		giantFoos.push_back(res2);
 
-		void* rawPointer3 = buddyAllocator.operator new(sizeof(EpicFoo));
+		void* rawPointer3 = buddyAllocator.operator new(sizeof(Foo));
 
-		EpicFoo* res3 = new (rawPointer2) EpicFoo();
+		Foo* res3 = new (rawPointer2) Foo();
 
-		epicFoos.push_back(res3);
+		foos.push_back(res3);
 	}
 
 	for (size_t i = 0; i < size; ++i)
@@ -459,7 +459,7 @@ void UnitTests::Allocate_Via_Slab_RandomObject_DeleteRandomPosition(const BuddyA
 	for (size_t i = 0; i < size; i++)
 	{
 		//void* rawPointer = smallObject.operator new(sizeOfFoo);
-		void* rawPointer = smallObject.operator new(sizeof(EpicFoo));
+		void* rawPointer = smallObject.operator new(sizeof(Foo));
 
 		Foo* result = new (rawPointer) Foo();
 
