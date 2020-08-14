@@ -146,7 +146,7 @@ void BuddyAllocator::SetBitToZero_SplitTable(const size_t parentIndex)
 	void* address = (m_PointerToData + ((highestLevel) * sizeof(PtrInt)) + (NUMBER_OF_BITSET_FOR_FREE_TABLE / 8) +
 		(sizeof(PtrInt) * ((parentIndex / sizeof(PtrInt)) / 8)));
 
-	bool test = *static_cast<PtrInt*>(address);
+	//bool test = *static_cast<PtrInt*>(address);
 	bool res1 = (*static_cast<PtrInt*>(address)) & (PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)));
 
 	(*static_cast<PtrInt*>(address)) &= ~(PtrInt(1) << (parentIndex % (sizeof(PtrInt) * 8)));
@@ -214,8 +214,7 @@ BuddyAllocator::BuddyAllocator()
 	{
 		*((PtrInt*)(m_PointerToData)) = (PtrInt)(m_PointerToData);
 
-		FreeListInformation* foo = (FreeListInformation*)(m_PointerToData);
-		*foo = { nullptr, nullptr };
+		*((FreeListInformation*)(m_PointerToData)) = { nullptr, nullptr };
 	}
 
 	size_t size = sizeof(PtrInt);
@@ -233,10 +232,8 @@ BuddyAllocator::BuddyAllocator()
 		void* splitTableAddress = (m_PointerToData + ((MAX_LEVELS) * sizeof(PtrInt)) + (NUMBER_OF_BITSET_FOR_FREE_TABLE / 8) +
 			(sizeof(PtrInt) * ((i / sizeof(PtrInt)) / 8)));
 
-
 		*static_cast<PtrInt*>(freeTableAddress) = 0;
 		*static_cast<PtrInt*>(splitTableAddress) = 0;
-
 
 		//SetBitToZero_FreeTable(i);
 		//SetBitToZero_SplitTable(i);
@@ -255,7 +252,6 @@ BuddyAllocator::BuddyAllocator()
 
 	SimulateAllocationForLeaves_ForFreeList(numberOfAllocationsOnLeafsNeeded);
 
-	int test = 42;
 }
 
 BuddyAllocator::~BuddyAllocator()
@@ -288,7 +284,7 @@ void BuddyAllocator::Free(void* pointerToFree, size_t levelIndex)
 		return;
 	}
 
-	// TODO:: that the pointerToFree and level are valid
+	// validate that the pointerToFree and level are correct
 
 	if (levelIndex == 0)
 	{
@@ -340,7 +336,7 @@ void BuddyAllocator::Free(void* pointerToFree, size_t levelIndex)
 	size_t getParentIndex = GetParent(uniqueIndexOfThePointer);
 	size_t parentLevel = levelIndex - 1;
 	
-	
+
 	while (true)
 	{
 		// the other buddy is free
@@ -524,8 +520,6 @@ void* BuddyAllocator::Allocate(size_t blockSize)
 		std::cout << "Size is less than the minimum..." << '\n';
 		return g_SmallObjectAllocator->Allocate(blockSize);
 	}
-
-	// TODO:: assert some stuff...
 
 	size_t initialLevel = m_NumberOfLevels - FastLogarithm::Log2_64(blockSize) + !FastOperationsWithTwo::IsPowerOfTwo(blockSize);
 
