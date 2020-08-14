@@ -3,6 +3,8 @@
 #include <iostream>
 #include <assert.h>
 
+#include "SmallObject.h"
+
 void BuddyAllocator::SimulateAllocationForLeaves_ForFreeList(size_t numberOfAllocationsOnLeafsNeeded)
 {
 	int level = MAX_LEVELS - FastLogarithm::Log2_64(LEAF_SIZE);
@@ -488,7 +490,7 @@ void BuddyAllocator::Free(void* pointerToFree)
 		{
 			++initialLevel;
 
-			if (initialLevel == 9)
+			if (initialLevel == highestLevel)
 			{
 				break;
 			}
@@ -510,7 +512,7 @@ void* BuddyAllocator::Allocate(size_t blockSize)
 	if (blockSize < LEAF_SIZE)
 	{
 		std::cout << "Size is less than the minimum..." << '\n';
-		return nullptr;
+		return g_SmallObjectAllocator->Allocate(blockSize);
 	}
 
 	// TODO:: assert some stuff...

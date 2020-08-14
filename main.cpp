@@ -60,7 +60,7 @@ int main()
 	std::vector<EpicFoo*> foos;
 	foos.reserve(size);
 
-	for (size_t i = 0; i < 510; i++)
+	for (size_t i = 0; i < size; i++)
 	{
 		//void* rawPointer = smallObject.operator new(sizeOfFoo);
 		void* rawPointer = buddyAllocator.operator new(sizeof(EpicFoo));
@@ -72,13 +72,13 @@ int main()
 		//foos.push_back(result1);
 	}
 
-	for (size_t i = 0; i < 510; i++)
+	for (size_t i = 0; i < size; i++)
 	{
 		//delete foos[i];
 		
 		foos[i]->~EpicFoo();
 
-		buddyAllocator.operator delete(foos[i], sizeof(EpicFoo));
+		buddyAllocator.operator delete(foos[size - i - 1], sizeof(EpicFoo));
 
 		//smallObject.operator delete(foos[size - i - 1], sizeOfFoo);
 		//smallObject.operator delete(foos[i], sizeOfFoo);
