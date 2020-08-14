@@ -426,7 +426,7 @@ void UnitTests::Allocate_Via_Slab_BigObjects_Add_Delete(const BuddyAllocatorObje
 		foos.push_back(result);
 
 		foos[i]->~GiantFoo();
-		smallObject.operator delete(foos[size - i - 1], sizeof(GiantFoo));
+		smallObject.operator delete(foos[i], sizeof(GiantFoo));
 	}
 
 
