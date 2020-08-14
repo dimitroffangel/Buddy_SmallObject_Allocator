@@ -77,7 +77,7 @@ void UnitTests::Allocate_Via_Buddy_SmallObjects_Add_Delete(const BuddyAllocatorO
 
 		foos[i]->~Foo();
 
-		buddyAllocator.operator delete(foos[i], sizeof(EpicFoo));
+		buddyAllocator.operator delete(foos[i], sizeof(Foo));
 	}
 
 	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
