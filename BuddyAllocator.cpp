@@ -273,10 +273,13 @@ void BuddyAllocator::Free(void* pointerToFree, size_t levelIndex)
 	size_t parentLevel = levelIndex - 1;
 	
 	// the pointer may be to a location, which is split, not used
+	bool a = uintptr_t(pointerToFree) >= (uintptr_t)(m_PointerToData);
+	bool b = (uintptr_t)(pointerToFree) < (uintptr_t)(m_PointerToData)+
+		(uintptr_t)(((MAX_LEVELS) * sizeof(PtrInt)) + 2 * (NUMBER_OF_BITSET_FOR_FREE_TABLE / 8));
 
 	if ((uintptr_t(pointerToFree) >= (uintptr_t)(m_PointerToData) &&
 		(uintptr_t)(pointerToFree) < (uintptr_t)(m_PointerToData) + 
-		(uintptr_t)((m_PointerToData + ((MAX_LEVELS) * sizeof(PtrInt)) + 2*(NUMBER_OF_BITSET_FOR_FREE_TABLE / 8)))))
+		(uintptr_t)(((MAX_LEVELS) * sizeof(PtrInt)) + 2*(NUMBER_OF_BITSET_FOR_FREE_TABLE / 8))))
 	{
 		std::cout << "BuddyAllocator::Free(void*, size_t) address that was tasksed with freeing was allocator specific memory and therefore not freeable" << '\n';
 		return;

@@ -68,7 +68,6 @@ int main()
 
 	buddyAllocator.Initialize();
 
-
 	const int size = 1000000;
 
 	std::vector<EpicFoo*> foos;
@@ -85,8 +84,6 @@ int main()
 	//	Foo* result1 = new Foo();
 	//	foos.push_back(result1);
 	}
-
-	buddyAllocator.Free(buddyAllocator.m_PointerToData + sizeof(PtrInt), 9);
 
 	for (size_t i = 0; i < 508; i++)
 	{
