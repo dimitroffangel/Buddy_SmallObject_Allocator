@@ -60,7 +60,7 @@ FixedLocationAllocator::FixedLocationAllocator(void* location, const unsigned ch
 	for (size_t i = 0; i < numberOfChunksToAllocate; ++i)
 	{
 		void* currentChunk = m_PointerToData + preliminarySize + i *(numberOfBlocks * blockSize);
-		InitializeChunk(currentChunk, numberOfBlocks, blockSize);
+		InitializeChunk(currentChunk, numberOfBlocks);
 	}
 }
 
@@ -69,9 +69,11 @@ void* FixedLocationAllocator::Allocate()
 	return nullptr;
 }
 
-void FixedLocationAllocator::InitializeChunk(void* chunkPointerToData, const size_t blockSize, const size_t numberOfBlocks)
+void FixedLocationAllocator::InitializeChunk(void* chunkPointerToData, const size_t numberOfBlocks)
 {
 	assert(chunkPointerToData != nullptr);
+
+	const size_t blockSize = *m_PointerToData;
 
 	unsigned char i = 0;
 	unsigned char* tempPointer = static_cast<unsigned char*>(chunkPointerToData);
@@ -82,8 +84,10 @@ void FixedLocationAllocator::InitializeChunk(void* chunkPointerToData, const siz
 	}
 }
 
-inline void* FixedLocationAllocator::ChunkAllocation(const size_t blockSize, const size_t chunkIndex)
+inline void* FixedLocationAllocator::ChunkAllocation(const size_t chunkIndex)
 {	
+	const size_t blockSize = *m_PointerToData;
+
 	unsigned char* chunkPreambleInfo = (m_PointerToData + 4 * sizeof(unsigned char) +
 		NUMBER_OF_POINTERS * sizeof(PtrInt) + chunkIndex * SIZE_OF_CHUNK_INFO_NEEDED);
 
@@ -112,4 +116,42 @@ inline void* FixedLocationAllocator::ChunkAllocation(const size_t blockSize, con
 	--blockAvailable;
 
 	return pointerResult;
+}
+
+inline void FixedLocationAllocator::ChunkDeallocation(void* pointerToFree, const size_t chunkIndex)
+{
+	if (pointerToFree == nullptr)
+	{
+		std::cerr << "FixedLocationAllocator::ChunkDeallocation void* pointerToFree is nullptr" << '\n';
+		return;
+	}
+
+	const size_t blockSize = *m_PointerToData;
+
+	unsigned char* chunkPreambleInfo = (m_PointerToData + 4 * sizeof(unsigned char) +
+		NUMBER_OF_POINTERS * sizeof(PtrInt) + chunkIndex * SIZE_OF_CHUNK_INFO_NEEDED);
+
+	unsigned char& firstAvailableBlock = *chunkPreambleInfo;
+
+	unsigned char& blockAvailable = *(chunkPreambleInfo + 1);
+
+
+	if (!((uintptr_t)(pointerToFree) >= (uintptr_t)(m_PointerToData) &&
+		(uintptr_t)(pointerToFree) < (uintptr_t)(m_PointerToData)+(uintptr_t)(blockSize * (*(m_PointerToData + 1)))))
+	{
+		std::cerr << "FixedLocationAllocator::ChunkDeallocation Deallocate pointer is off the range of the Chunk" << '\n';
+		return;
+	}
+
+	unsigned char* toReleasePointer = static_cast<unsigned char*>(pointerToFree);
+
+	// alignment check
+	assert((toReleasePointer - m_PointerToData) % blockSize == 0);
+
+	*toReleasePointer = firstAvailableBlock;
+	firstAvailableBlock = static_cast<unsigned char>((toReleasePointer - m_PointerToData) / blockSize);
+
+	// Truncation check
+	assert(firstAvailableBlock == (toReleasePointer - m_PointerToData) / blockSize);
+	++blockAvailable;
 }

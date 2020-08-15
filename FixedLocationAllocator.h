@@ -30,8 +30,9 @@ private:
 	//Chunk* m_RecentlyAllocatedChunk;
 	//Chunk* m_RecentlyDeallocatedChunk;
 
-	inline void InitializeChunk(void* chunkPointerToData, const size_t blockSize, const size_t numberOfBlockss);
-	inline void* ChunkAllocation(const size_t blockSize, const size_t chunkIndex);
+	inline void InitializeChunk(void* chunkPointerToData, const size_t numberOfBlockss);
+	inline void* ChunkAllocation(const size_t chunkIndex);
+	inline void ChunkDeallocation(void* pointerToFree, const size_t chunkIndex);
 };
 
 
