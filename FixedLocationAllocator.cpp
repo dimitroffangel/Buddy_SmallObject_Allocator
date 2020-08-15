@@ -333,8 +333,12 @@ void* FixedLocationAllocator::FindChunkWithPointer(void* pointerToFind)
 		NUMBER_OF_POINTERS * sizeof(PtrInt) + SIZE_OF_CHUNK_INFO_NEEDED * numberOfChunks;
 
 	assert((uintptr_t)(recentlyDeallocatedChunk) >= (uintptr_t)(firstChunkInAllocator) &&
-		(uintptr_t)(recentlyDeallocatedChunk) <
-		(uintptr_t)(firstChunkInAllocator)+ (uintptr_t)(PtrInt(numberOfChunks) * PtrInt(blockSize) * (numberOfBlocks)));
+		(uintptr_t)(recentlyDeallocatedChunk) < 
+		(uintptr_t)(firstChunkInAllocator)+ (uintptr_t)(PtrInt(numberOfChunks) * PtrInt(blockSize) * PtrInt(numberOfBlocks)));
+
+	assert((uintptr_t)(pointerToFind) >= (uintptr_t)(firstChunkInAllocator) &&
+		(uintptr_t)(pointerToFind) <
+		(uintptr_t)(firstChunkInAllocator)+(uintptr_t)(PtrInt(numberOfChunks) * PtrInt(blockSize) * PtrInt(numberOfBlocks)));
 
 	unsigned char* lowBound = firstChunkInAllocator;
 	unsigned char* highBound = firstChunkInAllocator + chunkLength * numberOfChunks;
