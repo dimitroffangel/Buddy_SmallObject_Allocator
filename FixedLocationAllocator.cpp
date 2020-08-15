@@ -1,17 +1,18 @@
 #include "FixedLocationAllocator.h"
 
 #include <assert.h>
+#include <iostream>
 
 #include "FastLogarithm.h"
 
 FixedLocationAllocator::FixedLocationAllocator(void* location, const unsigned char blockSize, 
-	const size_t sizeOfLocation, const size_t numberOfChunksToAllocate)
+	const size_t sizeOfLocation, const unsigned char numberOfChunksToAllocate)
 {
 	assert(location != nullptr);
 
 	m_PointerToData = static_cast<unsigned char*>(location);
 
-	const size_t preliminarySize = sizeof(unsigned char) + 2 * sizeof(PtrInt) + numberOfChunksToAllocate * (2 * sizeof(unsigned char));
+	const size_t preliminarySize = 4 * sizeof(unsigned char) + 2 * sizeof(PtrInt) + numberOfChunksToAllocate * (2 * sizeof(unsigned char));
 	
 	size_t numberOfBlocks = DEFAULT_CHUNK_SIZE / blockSize;
 
@@ -31,25 +32,28 @@ FixedLocationAllocator::FixedLocationAllocator(void* location, const unsigned ch
 	assert(numberOfBlocks == static_cast<unsigned char>(numberOfBlocks));
 	assert(preliminarySize + numberOfBlocks * blockSize * numberOfChunksToAllocate <= sizeOfLocation);
 
-	*m_PointerToData = static_cast<unsigned char>(blockSize);
-
+	*m_PointerToData = blockSize;
+	*(m_PointerToData + 1) = static_cast<unsigned char>(numberOfBlocks);
+	*(m_PointerToData + 2) = numberOfChunksToAllocate;
+	*(m_PointerToData + 3) = 0; // byte used only for alignment
 
 	// allocate the pointers
-	const size_t numberOfPointers = 2;
-	for (size_t i = 0; i < numberOfBlocks; ++i)
+	for (size_t i = 0; i < NUMBER_OF_POINTERS; ++i)
 	{
-		*(PtrInt*)(m_PointerToData + sizeof(unsigned char) + i * sizeof(PtrInt)) = 0;
+		*(PtrInt*)(m_PointerToData + 4*sizeof(unsigned char) + i * sizeof(PtrInt)) = 0;
 	}
 
 	// allocate preamble information for the chunks
-	const size_t chunkInfoNeeded = 2 * sizeof(unsigned char);
-
-	for (size_t i = 0; i < numberOfChunksToAllocate; ++i)
+	for (size_t i = 0; i < SIZE_OF_CHUNK_INFO_NEEDED; ++i)
 	{
-		void* currentChunkInfo = m_PointerToData + sizeof(unsigned char) + numberOfPointers * sizeof(PtrInt) + i * chunkInfoNeeded;
+		unsigned char* currentChunkInfo = m_PointerToData + 4*sizeof(unsigned char) + 
+			NUMBER_OF_POINTERS * sizeof(PtrInt) + i * SIZE_OF_CHUNK_INFO_NEEDED;
 
+		// *currentChunkInfo -> firstAvailableBlock
 		*static_cast<unsigned char*>(currentChunkInfo) = 0;
-		*static_cast<unsigned char*>(currentChunkInfo) = numberOfBlocks;
+		
+		// *(currentChunkInfo + 1) -> m_BlocksAvailable
+		*static_cast<unsigned char*>(currentChunkInfo + 1) = numberOfBlocks;
 	}
 
 	// initialize the chunk
@@ -76,4 +80,36 @@ void FixedLocationAllocator::InitializeChunk(void* chunkPointerToData, const siz
 	{
 		*tempPointer = ++i;
 	}
+}
+
+inline void* FixedLocationAllocator::ChunkAllocation(const size_t blockSize, const size_t chunkIndex)
+{	
+	unsigned char* chunkPreambleInfo = (m_PointerToData + 4 * sizeof(unsigned char) +
+		NUMBER_OF_POINTERS * sizeof(PtrInt) + chunkIndex * SIZE_OF_CHUNK_INFO_NEEDED);
+
+	unsigned char& firstAvailableBlock = *chunkPreambleInfo;
+
+	unsigned char& blockAvailable = *(chunkPreambleInfo + 1);
+
+	unsigned char* chunkPointer;
+	
+	const unsigned char numberOfChunks = *(m_PointerToData + 2);
+	{
+		chunkPointer = m_PointerToData + 4 * sizeof(unsigned char) +
+			NUMBER_OF_POINTERS * sizeof(PtrInt) + SIZE_OF_CHUNK_INFO_NEEDED * numberOfChunks + chunkIndex;
+	}
+
+	if (blockAvailable == 0)
+	{
+		std::cout << "Chunk is empty cannot allocate here..." << '\n';
+		return nullptr;
+	}
+
+	unsigned char* pointerResult =
+		chunkPointer + (firstAvailableBlock * blockSize);
+
+	firstAvailableBlock = *pointerResult;
+	--blockAvailable;
+
+	return pointerResult;
 }
