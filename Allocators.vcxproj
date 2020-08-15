@@ -128,6 +128,7 @@
     <ClCompile Include="Chunk.cpp" />
     <ClCompile Include="FastLogarithm.cpp" />
     <ClCompile Include="FixedAllocator.cpp" />
+    <ClCompile Include="FixedLocationAllocator.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="SmallObject.cpp" />
     <ClCompile Include="SmallObjectAllocator.cpp" />
@@ -139,6 +140,7 @@
     <ClInclude Include="Chunk.h" />
     <ClInclude Include="FastLogarithm.h" />
     <ClInclude Include="FixedAllocator.h" />
+    <ClInclude Include="FixedLocationAllocator.h" />
     <ClInclude Include="SharedHandler.h" />
     <ClInclude Include="SmallObject.h" />
     <ClInclude Include="SmallObjectAllocator.h" />

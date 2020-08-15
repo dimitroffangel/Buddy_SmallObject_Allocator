@@ -16,7 +16,6 @@ void Chunk::Initialize(std::size_t blockSize, unsigned char numberOfBlocks)
 	}
 }
 
-
 void Chunk::Release()
 {
 	delete[] m_PointerToData;
