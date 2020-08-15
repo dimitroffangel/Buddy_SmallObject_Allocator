@@ -431,9 +431,8 @@ void FixedLocationAllocator::DoDeallocation(void* pointer)
 		m_PointerToData + NUMBER_OF_UNSIGNED_CHARS * sizeof(unsigned char) +
 		NUMBER_OF_POINTERS * sizeof(PtrInt) + SIZE_OF_CHUNK_INFO_NEEDED * numberOfChunks;
 
-	assert((uintptr_t)(recentlyDeallocatedChunk) >= (uintptr_t)(firstChunkInAllocator) &&
-		(uintptr_t)(recentlyDeallocatedChunk) <
-		(uintptr_t)(firstChunkInAllocator)+(uintptr_t)(PtrInt(numberOfChunks) * PtrInt(blockSize) * (numberOfBlocks)));
+	assert((uintptr_t)(pointer) >= (uintptr_t)(recentlyDeallocatedChunk) &&
+		(uintptr_t)(pointer) < (uintptr_t)(recentlyDeallocatedChunk)+(uintptr_t)(PtrInt(blockSize) * (numberOfBlocks)));
 
 	//assert(m_RecentlyDeallocatedChunk->m_PointerToData <= pointer);
 	//assert(m_RecentlyDeallocatedChunk->m_PointerToData + (m_NumberOfBlocks * m_BlockSize) > pointer);
