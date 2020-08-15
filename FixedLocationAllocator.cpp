@@ -67,7 +67,116 @@ FixedLocationAllocator::FixedLocationAllocator(void* location, const unsigned ch
 
 void* FixedLocationAllocator::Allocate()
 {
-	return nullptr;
+	void* rawRecentlyAllocatedChunk = m_PointerToData + NUMBER_OF_UNSIGNED_CHARS * sizeof(unsigned char);
+
+	unsigned char* recentlyAllocatedChunk = (unsigned char*)(*static_cast<PtrInt*>(rawRecentlyAllocatedChunk));
+
+	const unsigned char blockSize = *m_PointerToData;
+
+	const unsigned char numberOfBlocks = *(m_PointerToData + 1);
+
+	const unsigned char numberOfChunks = *(m_PointerToData + 2);
+
+	unsigned char* firstChunkInAllocator =
+		m_PointerToData + NUMBER_OF_UNSIGNED_CHARS * sizeof(unsigned char) +
+		NUMBER_OF_POINTERS * sizeof(PtrInt) + SIZE_OF_CHUNK_INFO_NEEDED * numberOfChunks;
+
+	if (recentlyAllocatedChunk == nullptr)
+	{
+		unsigned char recentlyAllocatedChunkBlockAvailable;
+		unsigned char recentlyAllocatedChunkIndex;
+
+
+		size_t currentChunkIndex = 0;
+
+		// find the first available chunk to use for allocation
+		for (;; firstChunkInAllocator += blockSize * numberOfBlocks)
+		{
+			if (currentChunkIndex + 1 == *(m_PointerToData + 2))
+			{
+				std::cout << "FixedLocationAllocator::Allocate() No free slot available..." << '\n';
+				return nullptr;
+			}
+
+			unsigned char* currentChunkPreambleInfo = m_PointerToData + NUMBER_OF_UNSIGNED_CHARS * sizeof(unsigned char) +
+				NUMBER_OF_POINTERS * sizeof(PtrInt) + currentChunkIndex * SIZE_OF_CHUNK_INFO_NEEDED;
+
+			const unsigned char currentIteratedChunkBlockAvailable = *(currentChunkPreambleInfo + 1);
+
+			// found it
+			if (currentIteratedChunkBlockAvailable > 0)
+			{
+				// set the recently allocated chunk to it
+				recentlyAllocatedChunk = firstChunkInAllocator;
+				*((PtrInt*)(m_PointerToData + NUMBER_OF_UNSIGNED_CHARS * sizeof(unsigned char))) = (PtrInt)firstChunkInAllocator;
+
+
+				recentlyAllocatedChunkBlockAvailable = currentIteratedChunkBlockAvailable;
+
+				recentlyAllocatedChunkIndex =
+					(firstChunkInAllocator - recentlyAllocatedChunk) / (PtrInt(blockSize) * PtrInt(numberOfBlocks));
+
+				break;
+			}
+		}
+		
+		assert(recentlyAllocatedChunk != nullptr);
+		assert(recentlyAllocatedChunkBlockAvailable > 0);
+
+		return ChunkAllocation(recentlyAllocatedChunkIndex);
+	}
+
+	// assert that the pointer is in the range of the block
+	assert((uintptr_t)(recentlyAllocatedChunk) >= (uintptr_t)(firstChunkInAllocator) &&
+		(uintptr_t)(recentlyAllocatedChunk) < 
+		(uintptr_t)(firstChunkInAllocator)+(uintptr_t)(PtrInt(numberOfChunks) * PtrInt(blockSize) * (numberOfBlocks)));
+
+	unsigned char recentlyAllocatedChunkIndex =
+		(firstChunkInAllocator - recentlyAllocatedChunk) / (PtrInt(blockSize) * PtrInt(numberOfBlocks));
+
+	unsigned char* chunkPreambleInfo = m_PointerToData + NUMBER_OF_UNSIGNED_CHARS * sizeof(unsigned char) +
+		NUMBER_OF_POINTERS * sizeof(PtrInt) + recentlyAllocatedChunkIndex * SIZE_OF_CHUNK_INFO_NEEDED;
+
+	unsigned char recentlyAllocatedChunkBlockAvailable = *(chunkPreambleInfo + 1);
+
+	if (recentlyAllocatedChunk == nullptr ||
+		recentlyAllocatedChunkBlockAvailable == 0)
+	{
+		// logic is the thoroughly the same as above;
+		size_t currentChunkIndex = 0;
+
+		for (;; firstChunkInAllocator += blockSize * numberOfBlocks)
+		{
+			if (currentChunkIndex + 1 == *(m_PointerToData + 2))
+			{
+				std::cout << "FixedLocationAllocator::Allocate() No free slot available..." << '\n';
+				return nullptr;
+			}
+
+			unsigned char* currentChunkPreambleInfo = m_PointerToData + NUMBER_OF_UNSIGNED_CHARS * sizeof(unsigned char) +
+				NUMBER_OF_POINTERS * sizeof(PtrInt) + currentChunkIndex * SIZE_OF_CHUNK_INFO_NEEDED;
+
+			const unsigned char currentIteratedChunkBlockAvailable = *(currentChunkPreambleInfo + 1);
+
+			if (currentIteratedChunkBlockAvailable > 0)
+			{
+				recentlyAllocatedChunk = firstChunkInAllocator;
+				*((PtrInt*)(m_PointerToData + NUMBER_OF_UNSIGNED_CHARS * sizeof(unsigned char))) = (PtrInt)firstChunkInAllocator;
+
+				recentlyAllocatedChunkBlockAvailable = currentIteratedChunkBlockAvailable;
+
+				recentlyAllocatedChunkIndex =
+					(firstChunkInAllocator - recentlyAllocatedChunk) / (PtrInt(blockSize) * PtrInt(numberOfBlocks));
+
+				break;
+			}
+		}
+	}
+
+	assert(recentlyAllocatedChunk != nullptr);
+	assert(recentlyAllocatedChunkBlockAvailable > 0);
+
+	return ChunkAllocation(recentlyAllocatedChunkIndex);
 }
 
 void FixedLocationAllocator::InitializeChunk(void* chunkPointerToData, const size_t numberOfBlocks)
