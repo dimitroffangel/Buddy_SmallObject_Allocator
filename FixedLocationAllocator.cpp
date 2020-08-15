@@ -179,6 +179,42 @@ void* FixedLocationAllocator::Allocate()
 	return ChunkAllocation(recentlyAllocatedChunkIndex);
 }
 
+void FixedLocationAllocator::Deallocate(void* pointer)
+{
+	if (pointer == nullptr)
+	{
+		std::cerr << "FixedAllocator::Dealloacate() is nullptr" << '\n';
+		return;
+	}
+
+	void* rawRecentlyDeallocatedChunk = m_PointerToData + NUMBER_OF_UNSIGNED_CHARS * sizeof(unsigned char) + sizeof(PtrInt);
+
+	unsigned char* recentlyDeallocatedChunk = (unsigned char*)(*static_cast<PtrInt*>(rawRecentlyDeallocatedChunk));
+
+	// assert that the pointer is in the expected range of the block
+	{
+		const unsigned char blockSize = *m_PointerToData;
+
+		const unsigned char numberOfBlocks = *(m_PointerToData + 1);
+
+		const unsigned char numberOfChunks = *(m_PointerToData + 2);
+
+		unsigned char* firstChunkInAllocator =
+			m_PointerToData + NUMBER_OF_UNSIGNED_CHARS * sizeof(unsigned char) +
+			NUMBER_OF_POINTERS * sizeof(PtrInt) + SIZE_OF_CHUNK_INFO_NEEDED * numberOfChunks;
+
+		assert((uintptr_t)(recentlyDeallocatedChunk) >= (uintptr_t)(firstChunkInAllocator) &&
+			(uintptr_t)(recentlyDeallocatedChunk) <
+			(uintptr_t)(firstChunkInAllocator)+(uintptr_t)(PtrInt(numberOfChunks) * PtrInt(blockSize) * (numberOfBlocks)));
+	}
+
+	recentlyDeallocatedChunk = static_cast<unsigned char*>(FindChunkWithPointer(pointer));
+
+	assert(recentlyDeallocatedChunk != nullptr);
+
+	DoDeallocation(pointer);
+}
+
 void FixedLocationAllocator::InitializeChunk(void* chunkPointerToData, const size_t numberOfBlocks)
 {
 	assert(chunkPointerToData != nullptr);
@@ -263,4 +299,147 @@ inline void FixedLocationAllocator::ChunkDeallocation(void* pointerToFree, const
 	// Truncation check
 	assert(firstAvailableBlock == (toReleasePointer - m_PointerToData) / blockSize);
 	++blockAvailable;
+}
+
+void* FixedLocationAllocator::FindChunkWithPointer(void* pointerToFind)
+{
+	if (pointerToFind == nullptr)
+	{
+		std::cerr << "FixedLocationAllocator::FindChunkWithPointer argument is nullptr " << '\n';
+		return nullptr;
+	}
+
+	void* rawRecentlyDeallocatedChunk = m_PointerToData + NUMBER_OF_UNSIGNED_CHARS * sizeof(unsigned char) + sizeof(PtrInt);
+	
+	unsigned char* recentlyDeallocatedChunk = (unsigned char*)(*static_cast<PtrInt*>(rawRecentlyDeallocatedChunk));
+
+	assert(recentlyDeallocatedChunk != nullptr);
+
+	const unsigned char blockSize = *m_PointerToData;
+
+	const unsigned char numberOfBlocks = *(m_PointerToData + 1);
+
+	const unsigned char numberOfChunks = *(m_PointerToData + 2);
+
+	const size_t chunkLength = PtrInt(numberOfBlocks) * PtrInt(blockSize);
+
+	// TODO:: assertion that the pointer is aligned to the block of memory
+
+	unsigned char* low = recentlyDeallocatedChunk;
+	unsigned char* high = recentlyDeallocatedChunk + chunkLength;
+
+	unsigned char* firstChunkInAllocator =
+		m_PointerToData + NUMBER_OF_UNSIGNED_CHARS * sizeof(unsigned char) +
+		NUMBER_OF_POINTERS * sizeof(PtrInt) + SIZE_OF_CHUNK_INFO_NEEDED * numberOfChunks;
+
+	assert((uintptr_t)(recentlyDeallocatedChunk) >= (uintptr_t)(firstChunkInAllocator) &&
+		(uintptr_t)(recentlyDeallocatedChunk) <
+		(uintptr_t)(firstChunkInAllocator)+ (uintptr_t)(PtrInt(numberOfChunks) * PtrInt(blockSize) * (numberOfBlocks)));
+
+	unsigned char* lowBound = firstChunkInAllocator;
+	unsigned char* highBound = firstChunkInAllocator + chunkLength * numberOfChunks;
+
+	if (high == highBound)
+		high = nullptr;
+
+	for (;;)
+	{
+		if (low != nullptr)
+		{
+			if ((uintptr_t)(pointerToFind) >= (uintptr_t)(low) && (uintptr_t)(pointerToFind) < (uintptr_t)(low) + (uintptr_t)(chunkLength))
+			{
+				return low;
+			}
+
+			if (low == lowBound)
+			{
+				low = nullptr;
+
+				if (high == nullptr)
+				{
+					break;
+				}
+			}
+
+			else
+			{
+				unsigned char lowChunkIndex = (low - firstChunkInAllocator) / chunkLength;
+
+				// low != lowBound => can move left
+				low = m_PointerToData + NUMBER_OF_UNSIGNED_CHARS * sizeof(unsigned char) +
+					NUMBER_OF_POINTERS * sizeof(PtrInt) + 
+					SIZE_OF_CHUNK_INFO_NEEDED * numberOfChunks + (lowChunkIndex - 1) * chunkLength;
+			}
+		}
+
+		if (high != nullptr)
+		{
+			if ((uintptr_t)(pointerToFind) >= (uintptr_t)(high) && (uintptr_t)(pointerToFind) < (uintptr_t)(high) +(uintptr_t)(chunkLength))
+			{
+				return high;
+			}
+
+			{
+				// increase the high
+				unsigned char highChunkIndex = (high - firstChunkInAllocator) / chunkLength;
+
+				high = m_PointerToData + NUMBER_OF_UNSIGNED_CHARS * sizeof(unsigned char) +
+					NUMBER_OF_POINTERS * sizeof(PtrInt) +
+					SIZE_OF_CHUNK_INFO_NEEDED * numberOfChunks + (highChunkIndex + 1) * chunkLength;
+			}
+
+			if (high == highBound)
+			{
+				high = nullptr;
+
+				if (low == nullptr)
+				{
+					break;
+				}
+			}
+		}
+	}
+
+	// should not come to this
+	assert(false);
+	return nullptr;
+}
+
+void FixedLocationAllocator::DoDeallocation(void* pointer)
+{
+	if (pointer == nullptr)
+	{
+		std::cerr << "FixedLocationAllocator::DoDeallocation() pointer is nullptr" << '\n';
+		return;
+	}
+
+	void* rawRecentlyDeallocatedChunk = m_PointerToData + NUMBER_OF_UNSIGNED_CHARS * sizeof(unsigned char) + sizeof(PtrInt);
+
+	unsigned char* recentlyDeallocatedChunk = (unsigned char*)(*static_cast<PtrInt*>(rawRecentlyDeallocatedChunk));
+
+	assert(recentlyDeallocatedChunk != nullptr);
+
+	const unsigned char blockSize = *m_PointerToData;
+
+	const unsigned char numberOfBlocks = *(m_PointerToData + 1);
+
+	const unsigned char numberOfChunks = *(m_PointerToData + 2);
+
+	const size_t chunkLength = numberOfBlocks * blockSize;
+
+	unsigned char* firstChunkInAllocator =
+		m_PointerToData + NUMBER_OF_UNSIGNED_CHARS * sizeof(unsigned char) +
+		NUMBER_OF_POINTERS * sizeof(PtrInt) + SIZE_OF_CHUNK_INFO_NEEDED * numberOfChunks;
+
+	assert((uintptr_t)(recentlyDeallocatedChunk) >= (uintptr_t)(firstChunkInAllocator) &&
+		(uintptr_t)(recentlyDeallocatedChunk) <
+		(uintptr_t)(firstChunkInAllocator)+(uintptr_t)(PtrInt(numberOfChunks) * PtrInt(blockSize) * (numberOfBlocks)));
+
+	//assert(m_RecentlyDeallocatedChunk->m_PointerToData <= pointer);
+	//assert(m_RecentlyDeallocatedChunk->m_PointerToData + (m_NumberOfBlocks * m_BlockSize) > pointer);
+
+	const unsigned char recentlyDeallocatedChunkIndex =
+		(firstChunkInAllocator - recentlyDeallocatedChunk) / (PtrInt(blockSize) * PtrInt(numberOfBlocks));
+
+	ChunkDeallocation(rawRecentlyDeallocatedChunk, recentlyDeallocatedChunkIndex);
 }
