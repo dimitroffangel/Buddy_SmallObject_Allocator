@@ -89,8 +89,9 @@ void FixedAllocator::DoDeallocation(void* pointer)
 		return;
 	}
 
-	assert(m_RecentlyDeallocatedChunk->m_PointerToData <= pointer);
-	assert(m_RecentlyDeallocatedChunk->m_PointerToData + (m_NumberOfBlocks * m_BlockSize) > pointer);
+	assert(m_RecentlyDeallocatedChunk != nullptr);
+	assert((uintptr_t)(pointer) >= (uintptr_t)(m_RecentlyDeallocatedChunk->m_PointerToData) && 
+		(uintptr_t)(pointer) < (uintptr_t)(m_RecentlyDeallocatedChunk->m_PointerToData) + (uintptr_t)(m_NumberOfBlocks * m_BlockSize));
 
 	m_RecentlyDeallocatedChunk->Deallocate(pointer, m_BlockSize, m_NumberOfBlocks);
 
@@ -158,9 +159,10 @@ Chunk* FixedAllocator::FindChunkWithPointer(void* pointer)
 
 	for (;;)
 	{
-		if (low)
+		if (low != nullptr)
 		{
-			if (pointer >= low->m_PointerToData && pointer < low->m_PointerToData + chunkLength)
+			if ((uintptr_t)(pointer) >= (uintptr_t)(low->m_PointerToData) && 
+				(uintptr_t)(pointer) < (uintptr_t)(low->m_PointerToData) + (uintptr_t)+(chunkLength))
 			{
 				return low;
 			}
@@ -181,9 +183,10 @@ Chunk* FixedAllocator::FindChunkWithPointer(void* pointer)
 			}
 		}
 
-		if (high)
+		if (high != nullptr)
 		{
-			if (pointer >= high->m_PointerToData && pointer < high->m_PointerToData + chunkLength)
+			if ((uintptr_t)(pointer) >= (uintptr_t)(high->m_PointerToData) && 
+				(uintptr_t)(pointer) < (uintptr_t)(high->m_PointerToData + chunkLength))
 			{
 				return high;
 			}
@@ -248,8 +251,8 @@ void FixedAllocator::Deallocate(void* pointer)
 	}
 
 	assert(!m_Chunks.empty());
-	assert(&m_Chunks.front() <= m_RecentlyDeallocatedChunk);
-	assert(&m_Chunks.back() >= m_RecentlyDeallocatedChunk);
+
+	assert((uintptr_t)(pointer) >= (uintptr_t)(&m_Chunks.front()) && (uintptr_t)(pointer) <= (uintptr_t)(&m_Chunks.back()));
 
 	m_RecentlyDeallocatedChunk = FindChunkWithPointer(pointer);
 
