@@ -255,7 +255,8 @@ void FixedAllocator::Deallocate(void* pointer)
 
 	assert(!m_Chunks.empty());
 
-	assert((uintptr_t)(pointer) >= (uintptr_t)(&m_Chunks.front()) && (uintptr_t)(pointer) <= (uintptr_t)(&m_Chunks.back()));
+	assert((uintptr_t)(pointer) >= (uintptr_t)(&m_Chunks.front()) && 
+		(uintptr_t)(pointer) <= (uintptr_t)(&m_Chunks.back()) + (uintptr_t)(m_BlockSize * m_NumberOfBlocks));
 
 	m_RecentlyDeallocatedChunk = FindChunkWithPointer(pointer);
 
