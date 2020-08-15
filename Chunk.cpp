@@ -72,6 +72,7 @@ void Chunk::Deallocate(void* deallocatePointer, size_t blockSize, const unsigned
 
 	unsigned char* toReleasePointer = static_cast<unsigned char*>(deallocatePointer);
 
+	// alignment check
 	assert((toReleasePointer - m_PointerToData) % blockSize == 0);
 
 	*toReleasePointer = m_FirstAvailableBlock;

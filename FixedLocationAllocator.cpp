@@ -12,7 +12,8 @@ FixedLocationAllocator::FixedLocationAllocator(void* location, const unsigned ch
 
 	m_PointerToData = static_cast<unsigned char*>(location);
 
-	const size_t preliminarySize = 4 * sizeof(unsigned char) + 2 * sizeof(PtrInt) + numberOfChunksToAllocate * (2 * sizeof(unsigned char));
+	const size_t preliminarySize = 
+		NUMBER_OF_UNSIGNED_CHARS * sizeof(unsigned char) + 2 * sizeof(PtrInt) + numberOfChunksToAllocate * (2 * sizeof(unsigned char));
 	
 	size_t numberOfBlocks = DEFAULT_CHUNK_SIZE / blockSize;
 
@@ -40,13 +41,13 @@ FixedLocationAllocator::FixedLocationAllocator(void* location, const unsigned ch
 	// allocate the pointers
 	for (size_t i = 0; i < NUMBER_OF_POINTERS; ++i)
 	{
-		*(PtrInt*)(m_PointerToData + 4*sizeof(unsigned char) + i * sizeof(PtrInt)) = 0;
+		*(PtrInt*)(m_PointerToData + NUMBER_OF_UNSIGNED_CHARS * sizeof(unsigned char) + i * sizeof(PtrInt)) = 0;
 	}
 
 	// allocate preamble information for the chunks
 	for (size_t i = 0; i < SIZE_OF_CHUNK_INFO_NEEDED; ++i)
 	{
-		unsigned char* currentChunkInfo = m_PointerToData + 4*sizeof(unsigned char) + 
+		unsigned char* currentChunkInfo = m_PointerToData + NUMBER_OF_UNSIGNED_CHARS * sizeof(unsigned char) +
 			NUMBER_OF_POINTERS * sizeof(PtrInt) + i * SIZE_OF_CHUNK_INFO_NEEDED;
 
 		// *currentChunkInfo -> firstAvailableBlock
@@ -88,8 +89,8 @@ inline void* FixedLocationAllocator::ChunkAllocation(const size_t chunkIndex)
 {	
 	const size_t blockSize = *m_PointerToData;
 
-	unsigned char* chunkPreambleInfo = (m_PointerToData + 4 * sizeof(unsigned char) +
-		NUMBER_OF_POINTERS * sizeof(PtrInt) + chunkIndex * SIZE_OF_CHUNK_INFO_NEEDED);
+	unsigned char* chunkPreambleInfo = m_PointerToData + NUMBER_OF_UNSIGNED_CHARS * sizeof(unsigned char) +
+		NUMBER_OF_POINTERS * sizeof(PtrInt) + chunkIndex * SIZE_OF_CHUNK_INFO_NEEDED;
 
 	unsigned char& firstAvailableBlock = *chunkPreambleInfo;
 
@@ -99,7 +100,7 @@ inline void* FixedLocationAllocator::ChunkAllocation(const size_t chunkIndex)
 	
 	const unsigned char numberOfChunks = *(m_PointerToData + 2);
 	{
-		chunkPointer = m_PointerToData + 4 * sizeof(unsigned char) +
+		chunkPointer = m_PointerToData + NUMBER_OF_UNSIGNED_CHARS * sizeof(unsigned char) +
 			NUMBER_OF_POINTERS * sizeof(PtrInt) + SIZE_OF_CHUNK_INFO_NEEDED * numberOfChunks + chunkIndex;
 	}
 
@@ -128,13 +129,12 @@ inline void FixedLocationAllocator::ChunkDeallocation(void* pointerToFree, const
 
 	const size_t blockSize = *m_PointerToData;
 
-	unsigned char* chunkPreambleInfo = (m_PointerToData + 4 * sizeof(unsigned char) +
-		NUMBER_OF_POINTERS * sizeof(PtrInt) + chunkIndex * SIZE_OF_CHUNK_INFO_NEEDED);
+	unsigned char* chunkPreambleInfo = m_PointerToData + NUMBER_OF_UNSIGNED_CHARS * sizeof(unsigned char) +
+		NUMBER_OF_POINTERS * sizeof(PtrInt) + chunkIndex * SIZE_OF_CHUNK_INFO_NEEDED;
 
 	unsigned char& firstAvailableBlock = *chunkPreambleInfo;
 
 	unsigned char& blockAvailable = *(chunkPreambleInfo + 1);
-
 
 	if (!((uintptr_t)(pointerToFree) >= (uintptr_t)(m_PointerToData) &&
 		(uintptr_t)(pointerToFree) < (uintptr_t)(m_PointerToData)+(uintptr_t)(blockSize * (*(m_PointerToData + 1)))))

@@ -9,6 +9,7 @@ const size_t UNSIGNED_CHAR_MAX = UCHAR_MAX;
 
 const unsigned DefaultNumberOfBlocks = 8;
 
+const size_t NUMBER_OF_UNSIGNED_CHARS = 4;
 const size_t NUMBER_OF_POINTERS = 2;
 const size_t SIZE_OF_CHUNK_INFO_NEEDED = 2 * sizeof(unsigned char);
 
