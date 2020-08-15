@@ -136,9 +136,9 @@ void FixedAllocator::DoDeallocation(void* pointer)
 	}
 }
 
-Chunk* FixedAllocator::FindChunkWithPointer(void* pointer)
+Chunk* FixedAllocator::FindChunkWithPointer(void* pointerToFind)
 {
-	if (pointer == nullptr)
+	if (pointerToFind == nullptr)
 	{
 		std::cerr << "FixedAllocator::FindChunkWithPointer argument is nullptr " << '\n';
 		return nullptr;
@@ -146,6 +146,9 @@ Chunk* FixedAllocator::FindChunkWithPointer(void* pointer)
 
 	assert(!m_Chunks.empty());
 	assert(m_RecentlyDeallocatedChunk != nullptr);
+
+	assert((uintptr_t)(pointerToFind) >= (uintptr_t)(&m_Chunks.front()) &&
+		(uintptr_t)(pointerToFind) < (uintptr_t)(&m_Chunks.back())+(uintptr_t)(m_BlockSize * m_NumberOfBlocks));
 
 	const std::size_t chunkLength = m_NumberOfBlocks * m_BlockSize;
 
@@ -161,8 +164,8 @@ Chunk* FixedAllocator::FindChunkWithPointer(void* pointer)
 	{
 		if (low != nullptr)
 		{
-			if ((uintptr_t)(pointer) >= (uintptr_t)(low->m_PointerToData) && 
-				(uintptr_t)(pointer) < (uintptr_t)(low->m_PointerToData) + (uintptr_t)+(chunkLength))
+			if ((uintptr_t)(pointerToFind) >= (uintptr_t)(low->m_PointerToData) &&
+				(uintptr_t)(pointerToFind) < (uintptr_t)(low->m_PointerToData) + (uintptr_t)+(chunkLength))
 			{
 				return low;
 			}
@@ -185,8 +188,8 @@ Chunk* FixedAllocator::FindChunkWithPointer(void* pointer)
 
 		if (high != nullptr)
 		{
-			if ((uintptr_t)(pointer) >= (uintptr_t)(high->m_PointerToData) && 
-				(uintptr_t)(pointer) < (uintptr_t)(high->m_PointerToData + chunkLength))
+			if ((uintptr_t)(pointerToFind) >= (uintptr_t)(high->m_PointerToData) &&
+				(uintptr_t)(pointerToFind) < (uintptr_t)(high->m_PointerToData + chunkLength))
 			{
 				return high;
 			}
