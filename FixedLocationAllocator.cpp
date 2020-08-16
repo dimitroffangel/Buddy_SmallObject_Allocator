@@ -114,7 +114,7 @@ void* FixedLocationAllocator::Allocate()
 				recentlyAllocatedChunkBlockAvailable = currentIteratedChunkBlockAvailable;
 
 				recentlyAllocatedChunkIndex =
-					(firstChunkInAllocator - recentlyAllocatedChunk) / (PtrInt(blockSize) * PtrInt(numberOfBlocks));
+					(recentlyAllocatedChunk - firstChunkInAllocator) / (PtrInt(blockSize) * PtrInt(numberOfBlocks));
 
 				break;
 			}
