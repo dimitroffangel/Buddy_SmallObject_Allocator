@@ -130,6 +130,7 @@
     <ClCompile Include="FixedAllocator.cpp" />
     <ClCompile Include="FixedLocationAllocator.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="SlabPoolAllocator.cpp" />
     <ClCompile Include="SmallObject.cpp" />
     <ClCompile Include="SmallObjectAllocator.cpp" />
     <ClCompile Include="UnitTests.cpp" />
@@ -142,6 +143,7 @@
     <ClInclude Include="FixedAllocator.h" />
     <ClInclude Include="FixedLocationAllocator.h" />
     <ClInclude Include="SharedHandler.h" />
+    <ClInclude Include="SlabPoolAllocator.h" />
     <ClInclude Include="SmallObject.h" />
     <ClInclude Include="SmallObjectAllocator.h" />
     <ClInclude Include="UnitTests.h" />

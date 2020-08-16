@@ -203,6 +203,7 @@ void FixedLocationAllocator::Deallocate(void* pointer)
 			m_PointerToData + NUMBER_OF_UNSIGNED_CHARS * sizeof(unsigned char) +
 			NUMBER_OF_POINTERS * sizeof(PtrInt) + SIZE_OF_CHUNK_INFO_NEEDED * numberOfChunks;
 
+		// assertion the recentlyDeallocatedChunk is in the range of the adderesses where the chunks in the FixedLocationAllocator are
 		assert((uintptr_t)(recentlyDeallocatedChunk) >= (uintptr_t)(firstChunkInAllocator) &&
 			(uintptr_t)(recentlyDeallocatedChunk) <
 			(uintptr_t)(firstChunkInAllocator)+(uintptr_t)(PtrInt(numberOfChunks) * PtrInt(blockSize) * (numberOfBlocks)));
