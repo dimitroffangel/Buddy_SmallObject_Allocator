@@ -799,9 +799,9 @@ void UnitTests::Allocate_Via_Default_SmallObjects_Add_Delete()
 	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << '\n';
 }
 
-void UnitTests::Allocate_Via_Slab_MediumObjects()
+void UnitTests::Allocate_Via_Default_MediumObjects()
 {
-	std::cout << "UnitTests::Allocate_Via_Slab_MediumObjects(): ";
+	std::cout << "UnitTests:: UnitTests::Allocate_Via_Default_MediumObjects()";
 
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
@@ -832,9 +832,9 @@ void UnitTests::Allocate_Via_Slab_MediumObjects()
 	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << '\n';
 }
 
-void UnitTests::Allocate_Via_Slab_MediumObjects_Add_Delete()
+void UnitTests::Allocate_Via_Default_MediumObjects_Add_Delete()
 {
-	std::cout << "UnitTests:: Allocate_Via_Slab_MediumObjects_Add_Delete(): ";
+	std::cout << "UnitTests:: Allocate_Via_Default_MediumObjects_Add_Delete(): ";
 
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
