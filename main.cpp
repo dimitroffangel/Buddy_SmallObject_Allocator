@@ -13,7 +13,7 @@ int main()
 	BuddyAllocatorObject buddyAllocator;
 
 	UnitTests unitTests;
-	
+
 	std::cout << "Buddy allocator..." << '\n';
 	
 	const TypeDelete typeDelete = TypeDelete::EndBegin;

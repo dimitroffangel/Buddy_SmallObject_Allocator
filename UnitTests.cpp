@@ -4,6 +4,21 @@
 
 #include "SmallObjectAllocator.h"
 
+int GenerateRandomNumber(int from, int to)
+{
+	if (from > to)
+	{
+		std::cout << "UnitTest::GenerateRandomNumber() from > to" << '\n';
+		return 0;
+	}
+
+	static std::random_device randomDevice;  //Will be used to obtain a seed for the random number engine
+	static std::mt19937 generatorOfRandomNumbers(randomDevice()); //Standard mersenne_twister_engine seeded with rd()
+
+	std::uniform_int_distribution<> generatedRandomNumbers(from, to);
+
+	return generatedRandomNumbers(generatorOfRandomNumbers);
+}
 
 void UnitTests::Allocate_Via_Buddy_SmallObjects(const BuddyAllocatorObject& buddyAllocator, 
 	const SmallObject& smallObject, const TypeDelete typeDelete)
@@ -394,6 +409,113 @@ void UnitTests::Allocate_Via_Buddy_RandomObject_DeleteRandomPosition(const Buddy
 
 			giantFoos[i]->~GiantFoo();
 			buddyAllocator.operator delete(giantFoos[i], sizeof(GiantFoo));
+		}
+	}
+
+	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << '\n';
+}
+
+void UnitTests::Allocate_Via_Buddy_RandomObject_Add_DeleteRandomPosition(const BuddyAllocatorObject& buddyAllocator, 
+	const SmallObject&, const TypeDelete typeDelete)
+{
+	std::cout << "UnitTests::Allocate_Via_Buddy_RandomObject_DeleteRandomPosition(): ";
+
+	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+
+	const int blocks = 4;
+	const size_t sizeOfPtrInt = sizeof(PtrInt);
+	const size_t sizeOfFoo = sizeof(Foo);
+	const size_t sizeOfEpicFoo = sizeof(EpicFoo);
+	const size_t sizeofGiantFoo = sizeof(GiantFoo);
+
+	const int size = 10000;
+
+	std::vector<PointerInformation> foos;
+	foos.reserve(size);
+
+	for (size_t i = 0; i < size; i++)
+	{
+		const int randomNumber = GenerateRandomNumber(0, 2);
+
+		if (randomNumber == 0)
+		{
+			void* rawPointer = buddyAllocator.operator new(sizeof(EpicFoo));
+
+			EpicFoo* result = new (rawPointer) EpicFoo();
+
+			foos.push_back({ rawPointer, sizeof(EpicFoo) });
+		}
+
+		
+		if (randomNumber == 1)
+		{
+			void* rawPointer2 = buddyAllocator.operator new(sizeof(GiantFoo));
+
+			GiantFoo* res2 = new (rawPointer2) GiantFoo();
+
+			foos.push_back({ rawPointer2, sizeof(GiantFoo) });
+		}
+
+		if (randomNumber == 1)
+		{
+			void* rawPointer3 = buddyAllocator.operator new(sizeof(Foo));
+
+			Foo* res3 = new (rawPointer3) Foo();
+
+			foos.push_back({ rawPointer3, sizeof(Foo) });
+		}
+	}
+
+	if (typeDelete == TypeDelete::EndBegin)
+	{
+		for (size_t i = 0; i < size; ++i)
+		{
+			int randomNumber = size - i - 1;
+
+			if (foos[randomNumber].sizeOfObjectThere == sizeof(Foo))
+			{
+				static_cast<Foo*>(foos[randomNumber].pointer)->~Foo();
+				buddyAllocator.operator delete(foos[randomNumber].pointer, sizeof(Foo));
+			}
+
+			else if (foos[randomNumber].sizeOfObjectThere == sizeof(EpicFoo))
+			{
+				static_cast<EpicFoo*>(foos[randomNumber].pointer)->~EpicFoo();
+				buddyAllocator.operator delete(foos[randomNumber].pointer, sizeof(EpicFoo));
+			}
+
+			else if (foos[randomNumber].sizeOfObjectThere == sizeof(GiantFoo))
+			{
+				static_cast<GiantFoo*>(foos[randomNumber].pointer)->~GiantFoo();
+				buddyAllocator.operator delete(foos[randomNumber].pointer, sizeof(GiantFoo));
+			}
+		}
+	}
+
+	if (typeDelete == TypeDelete::BeginEnd)
+	{
+		for (size_t i = 0; i < size; ++i)
+		{
+			int randomNumber = i;
+
+			if (foos[randomNumber].sizeOfObjectThere == sizeof(Foo))
+			{
+				static_cast<Foo*>(foos[randomNumber].pointer)->~Foo();
+				buddyAllocator.operator delete(foos[randomNumber].pointer, sizeof(Foo));
+			}
+
+			else if (foos[randomNumber].sizeOfObjectThere == sizeof(EpicFoo))
+			{
+				static_cast<EpicFoo*>(foos[randomNumber].pointer)->~EpicFoo();
+				buddyAllocator.operator delete(foos[randomNumber].pointer, sizeof(EpicFoo));
+			}
+
+			else if (foos[randomNumber].sizeOfObjectThere == sizeof(GiantFoo))
+			{
+				static_cast<GiantFoo*>(foos[randomNumber].pointer)->~GiantFoo();
+				buddyAllocator.operator delete(foos[randomNumber].pointer, sizeof(GiantFoo));
+			}
 		}
 	}
 

@@ -5,6 +5,7 @@
 #include "SmallObject.h"
 #include "BuddyAllocator.h"
 #include "BuddyAllocatorObject.h"
+#include <random>
 
 class Foo
 {
@@ -62,12 +63,22 @@ class GiantFoo
 }; // 2^9 + 2^5 + 2^5 = 2^9 + 64 = 512 + 64 = 576 -> 64 bit machine
 // 2^9 + 16 + 32 = 512 + 48 = 560 -> 32 bit machine  
 
+
+
 enum TypeDelete
 {
 	BeginEnd,
 	EndBegin,
 	Random
 };
+
+struct PointerInformation
+{
+	void* pointer;
+	size_t sizeOfObjectThere;
+};
+
+int GenerateRandomNumber(int from, int to);
 
 struct UnitTests
 {
@@ -78,7 +89,8 @@ struct UnitTests
 	void Allocate_Via_Buddy_BigObjects(const BuddyAllocatorObject&, const SmallObject&, const TypeDelete);
 	void Allocate_Via_Buddy_BigObjects_Add_Delete(const BuddyAllocatorObject& , const SmallObject&);
 	void Allocate_Via_Buddy_AllObjects_Add_Delete(const BuddyAllocatorObject&, const SmallObject&);
-	void Allocate_Via_Buddy_RandomObject_DeleteRandomPosition(const BuddyAllocatorObject& , const SmallObject&, const TypeDelete);
+	void Allocate_Via_Buddy_RandomObject_DeleteRandomPosition(const BuddyAllocatorObject&, const SmallObject&, const TypeDelete);
+	void Allocate_Via_Buddy_RandomObject_Add_DeleteRandomPosition(const BuddyAllocatorObject& , const SmallObject&, const TypeDelete);
 
 	void Allocate_Via_Slab_SmallObjects(const BuddyAllocatorObject&, const SmallObject&);
 	void Allocate_Via_Slab_SmallObjects_Add_Delete(const BuddyAllocatorObject&, const SmallObject&);
