@@ -71,14 +71,14 @@ enum TypeDelete
 
 struct UnitTests
 {
-	void Allocate_Via_Buddy_SmallObjects(const BuddyAllocatorObject&, const SmallObject&);
+	void Allocate_Via_Buddy_SmallObjects(const BuddyAllocatorObject&, const SmallObject&, const TypeDelete);
 	void Allocate_Via_Buddy_SmallObjects_Add_Delete(const BuddyAllocatorObject&, const SmallObject&);
-	void Allocate_Via_Buddy_MediumObjects(const BuddyAllocatorObject&, const SmallObject&);
+	void Allocate_Via_Buddy_MediumObjects(const BuddyAllocatorObject&, const SmallObject&, const TypeDelete);
 	void Allocate_Via_Buddy_MediumObjects_Add_Delete(const BuddyAllocatorObject&, const SmallObject&);
-	void Allocate_Via_Buddy_BigObjects(const BuddyAllocatorObject&, const SmallObject&);
+	void Allocate_Via_Buddy_BigObjects(const BuddyAllocatorObject&, const SmallObject&, const TypeDelete);
 	void Allocate_Via_Buddy_BigObjects_Add_Delete(const BuddyAllocatorObject& , const SmallObject&);
 	void Allocate_Via_Buddy_AllObjects_Add_Delete(const BuddyAllocatorObject&, const SmallObject&);
-	void Allocate_Via_Buddy_RandomObject_DeleteRandomPosition(const BuddyAllocatorObject& , const SmallObject&);
+	void Allocate_Via_Buddy_RandomObject_DeleteRandomPosition(const BuddyAllocatorObject& , const SmallObject&, const TypeDelete);
 
 	void Allocate_Via_Slab_SmallObjects(const BuddyAllocatorObject&, const SmallObject&);
 	void Allocate_Via_Slab_SmallObjects_Add_Delete(const BuddyAllocatorObject&, const SmallObject&);
