@@ -2108,3 +2108,141 @@ void UnitTests::Allocate_Via_MallocFree_RandomObject_DeleteRandomPosition(const 
 	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << '\n';
 
 }
+
+void UnitTests::Allocate_Via_MallocFree_RandomObject_Add_DeleteRandomPosition(const TypeDelete typeDelete)
+{
+	std::cout << "UnitTests::Allocate_Via_MallocFree_RandomObject_Add_DeleteRandomPosition() ";
+
+	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+
+	const int blocks = 4;
+	const size_t sizeOfPtrInt = sizeof(PtrInt);
+	const size_t sizeOfFoo = sizeof(Foo);
+	const size_t sizeOfEpicFoo = sizeof(EpicFoo);
+	const size_t sizeofGiantFoo = sizeof(GiantFoo);
+
+	const int size = 10000;
+
+	std::vector<PointerInformation> foos;
+	foos.reserve(size);
+
+	for (size_t i = 0; i < size; i++)
+	{
+		const int randomNumber = GenerateRandomNumber(0, 2);
+
+		if (randomNumber == 0)
+		{
+			void* rawPointer = malloc(sizeof(EpicFoo));
+			EpicFoo* result1 = new (rawPointer) (EpicFoo);
+			
+			foos.push_back({ result1, sizeof(EpicFoo) });
+		}
+
+
+		if (randomNumber == 1)
+		{
+			void* rawPointer = malloc(sizeof(GiantFoo));
+			GiantFoo* result1 = new (rawPointer) (GiantFoo);
+
+			foos.push_back({ result1, sizeof(GiantFoo) });
+		}
+
+		if (randomNumber == 2)
+		{
+			void* rawPointer = malloc(sizeof(Foo));
+			Foo* result1 = new (rawPointer) (Foo);
+
+			foos.push_back({ result1, sizeof(Foo) });
+		}
+	}
+
+	if (typeDelete == TypeDelete::EndBegin)
+	{
+		for (size_t i = 0; i < size; ++i)
+		{
+			int randomNumber = size - i - 1;
+
+			if (foos[randomNumber].sizeOfObjectThere == sizeof(Foo))
+			{
+				Foo* currentObjectToDelete = static_cast<Foo*>(foos[randomNumber].pointer);
+				currentObjectToDelete->~Foo();
+				free(currentObjectToDelete);
+			}
+
+			else if (foos[randomNumber].sizeOfObjectThere == sizeof(EpicFoo))
+			{
+				EpicFoo* currentObjectToDelete = static_cast<EpicFoo*>(foos[randomNumber].pointer);
+				currentObjectToDelete->~EpicFoo();
+				free(currentObjectToDelete);
+			}
+
+			else if (foos[randomNumber].sizeOfObjectThere == sizeof(GiantFoo))
+			{
+				GiantFoo* currentObjectToDelete = static_cast<GiantFoo*>(foos[randomNumber].pointer);
+				currentObjectToDelete->~GiantFoo();
+				free(currentObjectToDelete);
+			}
+		}
+	}
+
+	if (typeDelete == TypeDelete::BeginEnd)
+	{
+		for (size_t i = 0; i < size; ++i)
+		{
+			int randomNumber = i;
+
+			if (foos[randomNumber].sizeOfObjectThere == sizeof(Foo))
+			{
+				Foo* currentObjectToDelete = static_cast<Foo*>(foos[randomNumber].pointer);
+				currentObjectToDelete->~Foo();
+				free(currentObjectToDelete);
+			}
+
+			else if (foos[randomNumber].sizeOfObjectThere == sizeof(EpicFoo))
+			{
+				EpicFoo* currentObjectToDelete = static_cast<EpicFoo*>(foos[randomNumber].pointer);
+				currentObjectToDelete->~EpicFoo();
+				free(currentObjectToDelete);
+			}
+
+			else if (foos[randomNumber].sizeOfObjectThere == sizeof(GiantFoo))
+			{
+				GiantFoo* currentObjectToDelete = static_cast<GiantFoo*>(foos[randomNumber].pointer);
+				currentObjectToDelete->~GiantFoo();
+				free(currentObjectToDelete);
+			}
+		}
+	}
+
+	if (typeDelete == TypeDelete::BeginEnd)
+	{
+		for (size_t i = 0; i < size; ++i)
+		{
+			const int randomNumber = GenerateRandomNumber(0, foos.size() - i - 1);
+
+			if (foos[randomNumber].sizeOfObjectThere == sizeof(Foo))
+			{
+				Foo* currentObjectToDelete = static_cast<Foo*>(foos[randomNumber].pointer);
+				currentObjectToDelete->~Foo();
+				free(currentObjectToDelete);
+			}
+
+			else if (foos[randomNumber].sizeOfObjectThere == sizeof(EpicFoo))
+			{
+				EpicFoo* currentObjectToDelete = static_cast<EpicFoo*>(foos[randomNumber].pointer);
+				currentObjectToDelete->~EpicFoo();
+				free(currentObjectToDelete);
+			}
+
+			else if (foos[randomNumber].sizeOfObjectThere == sizeof(GiantFoo))
+			{
+				GiantFoo* currentObjectToDelete = static_cast<GiantFoo*>(foos[randomNumber].pointer);
+				currentObjectToDelete->~GiantFoo();
+				free(currentObjectToDelete);
+			}
+		}
+	}
+
+	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << '\n';
+}
