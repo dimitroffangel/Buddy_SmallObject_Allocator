@@ -1025,3 +1025,38 @@ void UnitTests::Allocate_Via_Default_RandomObject_DeleteRandomPosition()
 	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << '\n';
 }
+
+void UnitTests::Allocate_Via_MallocFree_SmallObjects()
+{
+	std::cout << "UnitTests:: Allocate_Via_MallocFree_SmallObjects(): ";
+
+	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+
+	const int blocks = 4;
+	const size_t sizeOfPtrInt = sizeof(PtrInt);
+	const size_t sizeOfFoo = sizeof(Foo);
+	const size_t sizeOfEpicFoo = sizeof(EpicFoo);
+	const size_t sizeofGiantFoo = sizeof(GiantFoo);
+
+	const int size = 10000;
+
+	std::vector<Foo*> foos;
+	foos.reserve(size);
+
+	for (size_t i = 0; i < size; i++)
+	{
+		void* rawPointer = malloc(sizeof(Foo));
+		Foo* result1 = new (rawPointer) (Foo);
+		foos.push_back(result1);
+	}
+
+
+	for (size_t i = 0; i < size; i++)
+	{
+		foos[i]->~Foo();
+		free(foos[i]);
+	}
+
+	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << '\n';
+}
