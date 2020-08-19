@@ -84,6 +84,7 @@ struct UnitTests
 
 	void Allocate_Via_Default_SmallObjects();
 	void Allocate_Via_Default_SmallObjects_Add_Delete();
+	void Allocate_Via_Slab_MediumObjects();
 	void Allocate_Via_Default_BigObjects();
 	void Allocate_Via_Default_BigObjects_Add_Delete();
 	void Allocate_Via_Default_AllObjects_Add_Delete();
