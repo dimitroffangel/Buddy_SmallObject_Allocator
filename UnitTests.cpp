@@ -36,7 +36,7 @@ void UnitTests::Allocate_Via_Buddy_SmallObjects(const BuddyAllocatorObject& budd
 	{
 		for (size_t i = 0; i < size; i++)
 		{
-			foos[i]->~Foo();
+			foos[size - i - 1]->~Foo();
 
 			buddyAllocator.operator delete(foos[size - i - 1], sizeof(Foo));
 		}
@@ -122,7 +122,7 @@ void UnitTests::Allocate_Via_Buddy_MediumObjects(const BuddyAllocatorObject& bud
 	{
 		for (size_t i = 0; i < size; i++)
 		{
-			foos[i]->~EpicFoo();
+			foos[size - i - 1]->~EpicFoo();
 
 			buddyAllocator.operator delete(foos[size - i - 1], sizeof(EpicFoo));
 		}
@@ -208,7 +208,7 @@ void UnitTests::Allocate_Via_Buddy_BigObjects(const BuddyAllocatorObject& buddyA
 	{
 		for (size_t i = 0; i < size; i++)
 		{
-			foos[i]->~GiantFoo();
+			foos[size - i - 1]->~GiantFoo();
 
 			buddyAllocator.operator delete(foos[size - i - 1], sizeof(GiantFoo));
 		}
@@ -431,14 +431,9 @@ void UnitTests::Allocate_Via_Slab_SmallObjects(const BuddyAllocatorObject& buddy
 
 	for (size_t i = 0; i < size; i++)
 	{
-		foos[i]->~Foo();
+		foos[size - i - 1]->~Foo();
 
 		smallObject.operator delete(foos[size - i - 1], sizeof(Foo));
-
-		//smallObject.operator delete(foos[size - i - 1], sizeOfFoo);
-		//smallObject.operator delete(foos[i], sizeOfFoo);
-
-		//std::cout << size - i - 1 << " " << foos[size - i - 1]->a << "\n" ;
 	}
 
 	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
@@ -475,14 +470,9 @@ void UnitTests::Allocate_Via_Slab_MediumObjects(const BuddyAllocatorObject& budd
 
 	for (size_t i = 0; i < size; i++)
 	{
-		foos[i]->~EpicFoo();
+		foos[size - i - 1]->~EpicFoo();
 
 		smallObject.operator delete(foos[size - i - 1], sizeof(EpicFoo));
-
-		//smallObject.operator delete(foos[size - i - 1], sizeOfFoo);
-		//smallObject.operator delete(foos[i], sizeOfFoo);
-
-		//std::cout << size - i - 1 << " " << foos[size - i - 1]->a << "\n" ;
 	}
 
 	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
@@ -508,7 +498,6 @@ void UnitTests::Allocate_Via_Slab_MediumObjects_Add_Delete(const BuddyAllocatorO
 
 	for (size_t i = 0; i < size; i++)
 	{
-		//void* rawPointer = smallObject.operator new(sizeOfFoo);
 		void* rawPointer = smallObject.operator new(sizeof(EpicFoo));
 
 		EpicFoo* result = new (rawPointer) EpicFoo();
@@ -578,29 +567,19 @@ void UnitTests::Allocate_Via_Slab_BigObjects(const BuddyAllocatorObject&, const 
 
 	for (size_t i = 0; i < size; i++)
 	{
-		//void* rawPointer = smallObject.operator new(sizeOfFoo);
 		void* rawPointer = smallObject.operator new(sizeof(GiantFoo));
 
 		GiantFoo* result = new (rawPointer) GiantFoo();
 
 		foos.push_back(result);
-		//EpicFoo* result1 = new EpicFoo();
-		//foos.push_back(result1);
 	}
 
 
 	for (size_t i = 0; i < size; i++)
 	{
-		//delete foos[i];
-
-		foos[i]->~GiantFoo();
+		foos[size - i - 1]->~GiantFoo();
 
 		smallObject.operator delete(foos[size - i - 1], sizeof(GiantFoo));
-
-		//smallObject.operator delete(foos[size - i - 1], sizeOfFoo);
-		//smallObject.operator delete(foos[i], sizeOfFoo);
-
-		//std::cout << size - i - 1 << " " << foos[size - i - 1]->a << "\n" ;
 	}
 
 	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
@@ -627,7 +606,6 @@ void UnitTests::Allocate_Via_Slab_BigObjects_Add_Delete(const BuddyAllocatorObje
 
 	for (size_t i = 0; i < size; i++)
 	{
-		//void* rawPointer = smallObject.operator new(sizeOfFoo);
 		void* rawPointer = smallObject.operator new(sizeof(GiantFoo));
 
 		GiantFoo* result = new (rawPointer) GiantFoo();
@@ -668,7 +646,6 @@ void UnitTests::Allocate_Via_Slab_RandomObject_DeleteRandomPosition(const BuddyA
 
 	for (size_t i = 0; i < size; i++)
 	{
-		//void* rawPointer = smallObject.operator new(sizeOfFoo);
 		void* rawPointer = smallObject.operator new(sizeof(Foo));
 
 		Foo* result = new (rawPointer) Foo();
