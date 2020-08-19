@@ -89,7 +89,7 @@ void UnitTests::Allocate_Via_Buddy_SmallObjects_Add_Delete(const BuddyAllocatorO
 
 void UnitTests::Allocate_Via_Buddy_MediumObjects(const BuddyAllocatorObject& buddyAllocator, const SmallObject& smallObject)
 {
-	std::cout << "UnitTests::Allocate_Via_Buddy_SmallObjects(): ";
+	std::cout << "UnitTests::Allocate_Via_Buddy_MediumObjects(): ";
 
 	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
@@ -133,6 +133,42 @@ void UnitTests::Allocate_Via_Buddy_MediumObjects(const BuddyAllocatorObject& bud
 
 	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << '\n';
+}
+
+void UnitTests::Allocate_Via_Buddy_MediumObjects_Add_Delete(const BuddyAllocatorObject& buddyAllocator, const SmallObject& smallObjects)
+{
+	std::cout << "UnitTests::Allocate_Via_Buddy_MediumObjects_Add_Delete(): ";
+
+	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+
+	const int blocks = 4;
+	const size_t sizeOfPtrInt = sizeof(PtrInt);
+	const size_t sizeOfFoo = sizeof(Foo);
+	const size_t sizeOfEpicFoo = sizeof(EpicFoo);
+	const size_t sizeofGiantFoo = sizeof(GiantFoo);
+
+	const int size = 10000;
+
+	std::vector<EpicFoo*> foos;
+	foos.reserve(size);
+
+	for (size_t i = 0; i < size; i++)
+	{
+		//void* rawPointer = smallObject.operator new(sizeOfFoo);
+		void* rawPointer = buddyAllocator.operator new(sizeof(EpicFoo));
+
+		EpicFoo* result = new (rawPointer) EpicFoo();
+
+		foos.push_back(result);
+
+		foos[i]->~EpicFoo();
+		buddyAllocator.operator delete(foos[i], sizeof(GiantFoo));
+	}
+
+
+	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << '\n';
+
 }
 
 void UnitTests::Allocate_Via_Buddy_BigObjects(const BuddyAllocatorObject& buddyAllocator, const SmallObject& smallObject)
