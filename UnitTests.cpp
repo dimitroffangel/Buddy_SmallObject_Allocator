@@ -1261,15 +1261,15 @@ void UnitTests::Allocate_Via_MallocFree_AllObjects_Add_Delete()
 		foos[i]->~Foo();
 		free(foos[i]);
 
-		void* rawPointer = malloc(sizeof(GiantFoo));
-		GiantFoo* result2 = new (rawPointer) (GiantFoo);
+		void* rawPointer2 = malloc(sizeof(GiantFoo));
+		GiantFoo* result2 = new (rawPointer2) (GiantFoo);
 		giantFoos.push_back(result2);
 
 		giantFoos[i]->~GiantFoo();
 		free(giantFoos[i]);
 
-		void* rawPointer = malloc(sizeof(EpicFoo));
-		EpicFoo* result3 = new (rawPointer) (EpicFoo);
+		void* rawPointer3 = malloc(sizeof(EpicFoo));
+		EpicFoo* result3 = new (rawPointer3) (EpicFoo);
 		epicFoos.push_back(result3);
 
 		epicFoos[i]->~EpicFoo();
@@ -1309,12 +1309,12 @@ void UnitTests::Allocate_Via_MallocFree_RandomObject_DeleteRandomPosition()
 		Foo* result1 = new (rawPointer) (Foo);
 		foos.push_back(result1);
 
-		void* rawPointer = malloc(sizeof(EpicFoo));
-		EpicFoo* result3 = new (rawPointer) (EpicFoo);
-		epicFoos.push_back(result3);
+		void* rawPointer2 = malloc(sizeof(EpicFoo));
+		EpicFoo* result2 = new (rawPointer2) (EpicFoo);
+		epicFoos.push_back(result2);
 
-		void* rawPointer = malloc(sizeof(EpicFoo));
-		EpicFoo* result3 = new (rawPointer) (EpicFoo);
+		void* rawPointer3 = malloc(sizeof(EpicFoo));
+		EpicFoo* result3 = new (rawPointer3) (EpicFoo);
 		epicFoos.push_back(result3);
 	}
 

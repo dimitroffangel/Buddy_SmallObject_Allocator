@@ -3,6 +3,8 @@
 #include <vector>
 #include <assert.h>
 
+#include "FastLogarithm.h"
+
 FixedAllocator::FixedAllocator(std::size_t blockSize)
 	:m_BlockSize(blockSize)
 {
@@ -91,7 +93,7 @@ void FixedAllocator::DoDeallocation(void* pointer)
 
 	assert(m_RecentlyDeallocatedChunk != nullptr);
 	assert((uintptr_t)(pointer) >= (uintptr_t)(m_RecentlyDeallocatedChunk->m_PointerToData) && 
-		(uintptr_t)(pointer) < (uintptr_t)(m_RecentlyDeallocatedChunk->m_PointerToData) + (uintptr_t)(m_NumberOfBlocks * m_BlockSize));
+		(uintptr_t)(pointer) < (uintptr_t)(m_RecentlyDeallocatedChunk->m_PointerToData) + (uintptr_t)(PtrInt(m_NumberOfBlocks) * PtrInt(m_BlockSize)));
 
 	m_RecentlyDeallocatedChunk->Deallocate(pointer, m_BlockSize, m_NumberOfBlocks);
 
@@ -147,8 +149,22 @@ Chunk* FixedAllocator::FindChunkWithPointer(void* pointerToFind)
 	assert(!m_Chunks.empty());
 	assert(m_RecentlyDeallocatedChunk != nullptr);
 
-	assert((uintptr_t)(pointerToFind) >= (uintptr_t)(&m_Chunks.front()) &&
-		(uintptr_t)(pointerToFind) < (uintptr_t)(&m_Chunks.back())+(uintptr_t)(m_BlockSize * m_NumberOfBlocks));
+	bool assertHasFoundStorageChunk = false;
+
+	for (size_t i = 0; i < m_Chunks.size(); ++i)
+	{
+		if ((uintptr_t)(pointerToFind) >= (uintptr_t)(m_Chunks[i].m_PointerToData) &&
+			(uintptr_t)(pointerToFind) < (uintptr_t)(m_Chunks[i].m_PointerToData) + (uintptr_t)(PtrInt(m_BlockSize) * PtrInt(m_NumberOfBlocks)))
+		{
+			assertHasFoundStorageChunk = true;
+			break;
+		}
+	}
+
+	assert(assertHasFoundStorageChunk);
+
+	//assert((uintptr_t)(pointerToFind) >= (uintptr_t)(&m_Chunks.front()) &&
+	//	(uintptr_t)(pointerToFind) < (uintptr_t)(&m_Chunks.back())+(uintptr_t)(m_BlockSize * m_NumberOfBlocks));
 
 	const std::size_t chunkLength = m_NumberOfBlocks * m_BlockSize;
 
@@ -255,8 +271,20 @@ void FixedAllocator::Deallocate(void* pointer)
 
 	assert(!m_Chunks.empty());
 
-	assert((uintptr_t)(pointer) >= (uintptr_t)(&m_Chunks.front()) && 
-		(uintptr_t)(pointer) < (uintptr_t)(&m_Chunks.back()) + (uintptr_t)(m_BlockSize * m_NumberOfBlocks));
+	bool assertHasFoundStorageChunk = false;
+
+	for (size_t i = 0; i < m_Chunks.size(); ++i)
+	{
+		if ((uintptr_t)(pointer) >= (uintptr_t)(m_Chunks[i].m_PointerToData) &&
+			(uintptr_t)(pointer) < (uintptr_t)(m_Chunks[i].m_PointerToData) + (uintptr_t)(PtrInt(m_BlockSize) * PtrInt(m_NumberOfBlocks)))
+		{
+			assertHasFoundStorageChunk = true;
+			break;
+		}
+	}
+
+
+	assert(assertHasFoundStorageChunk);
 
 	m_RecentlyDeallocatedChunk = FindChunkWithPointer(pointer);
 

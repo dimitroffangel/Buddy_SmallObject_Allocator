@@ -16,12 +16,14 @@ int main()
 	
 	std::cout << "Buddy allocator..." << '\n';
 	
-	//unitTests.Allocate_Via_Buddy_BigObjects(buddyAllocator, smallObject);
-	//unitTests.Allocate_Via_Buddy_BigObjects_Add_Delete(buddyAllocator, smallObject);
-	//unitTests.Allocate_Via_Buddy_AllObjects_Add_Delete(buddyAllocator, smallObject);
-	//unitTests.Allocate_Via_Buddy_RandomObject_DeleteRandomPosition(buddyAllocator, smallObject);
-	//unitTests.Allocate_Via_Buddy_SmallObjects(buddyAllocator, smallObject);
-	//unitTests.Allocate_Via_Buddy_SmallObjects_Add_Delete(buddyAllocator, smallObject);
+	const TypeDelete typeDelete = TypeDelete::EndBegin;
+
+	unitTests.Allocate_Via_Buddy_BigObjects(buddyAllocator, smallObject, typeDelete);
+	unitTests.Allocate_Via_Buddy_BigObjects_Add_Delete(buddyAllocator, smallObject);
+	unitTests.Allocate_Via_Buddy_AllObjects_Add_Delete(buddyAllocator, smallObject);
+	unitTests.Allocate_Via_Buddy_RandomObject_DeleteRandomPosition(buddyAllocator, smallObject, typeDelete);
+	unitTests.Allocate_Via_Buddy_SmallObjects(buddyAllocator, smallObject, typeDelete);
+	unitTests.Allocate_Via_Buddy_SmallObjects_Add_Delete(buddyAllocator, smallObject);
 
 	std::cout << "Slab allocator..." << '\n';
 	
