@@ -457,7 +457,7 @@ void UnitTests::Allocate_Via_Buddy_RandomObject_Add_DeleteRandomPosition(const B
 			foos.push_back({ rawPointer2, sizeof(GiantFoo) });
 		}
 
-		if (randomNumber == 1)
+		if (randomNumber == 2)
 		{
 			void* rawPointer3 = buddyAllocator.operator new(sizeof(Foo));
 
