@@ -1146,11 +1146,12 @@ void UnitTests::Allocate_Via_MallocFree_MediumObjects_Add_Delete()
 
 	for (size_t i = 0; i < size; i++)
 	{
-		EpicFoo* result = new EpicFoo();
+		void* rawPointer = malloc(sizeof(EpicFoo));
+		EpicFoo* result1 = new (rawPointer) (EpicFoo);
+		foos.push_back(result1);
 
-		foos.push_back(result);
-
-		delete foos[i];
+		foos[i]->~EpicFoo();
+		free(foos[i]);
 	}
 
 	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
@@ -1180,7 +1181,6 @@ void UnitTests::Allocate_Via_MallocFree_BigObjects()
 		GiantFoo* result1 = new (rawPointer) (GiantFoo);
 		foos.push_back(result1);
 	}
-
 
 	for (size_t i = 0; i < size; i++)
 	{
