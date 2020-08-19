@@ -996,6 +996,139 @@ void UnitTests::Allocate_Via_Slab_RandomObject_DeleteRandomPosition(const BuddyA
 
 }
 
+void UnitTests::Allocate_Via_Slab_RandomObject_Add_DeleteRandomPosition(const BuddyAllocatorObject&,
+	const SmallObject& slabAllocator, const TypeDelete typeDelete)
+{
+	std::cout << "UnitTests::Allocate_Via_Slab_RandomObject_Add_DeleteRandomPosition() ";
+
+	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+
+	const int blocks = 4;
+	const size_t sizeOfPtrInt = sizeof(PtrInt);
+	const size_t sizeOfFoo = sizeof(Foo);
+	const size_t sizeOfEpicFoo = sizeof(EpicFoo);
+	const size_t sizeofGiantFoo = sizeof(GiantFoo);
+
+	const int size = 10000;
+
+	std::vector<PointerInformation> foos;
+	foos.reserve(size);
+
+	for (size_t i = 0; i < size; i++)
+	{
+		const int randomNumber = GenerateRandomNumber(0, 2);
+
+		if (randomNumber == 0)
+		{
+			void* rawPointer = slabAllocator.operator new(sizeof(EpicFoo));
+
+			EpicFoo* result = new (rawPointer) EpicFoo();
+
+			foos.push_back({ rawPointer, sizeof(EpicFoo) });
+		}
+
+
+		if (randomNumber == 1)
+		{
+			void* rawPointer2 = slabAllocator.operator new(sizeof(GiantFoo));
+
+			GiantFoo* res2 = new (rawPointer2) GiantFoo();
+
+			foos.push_back({ rawPointer2, sizeof(GiantFoo) });
+		}
+
+		if (randomNumber == 2)
+		{
+			void* rawPointer3 = slabAllocator.operator new(sizeof(Foo));
+
+			Foo* res3 = new (rawPointer3) Foo();
+
+			foos.push_back({ rawPointer3, sizeof(Foo) });
+		}
+	}
+
+	if (typeDelete == TypeDelete::EndBegin)
+	{
+		for (size_t i = 0; i < size; ++i)
+		{
+			int randomNumber = size - i - 1;
+
+			if (foos[randomNumber].sizeOfObjectThere == sizeof(Foo))
+			{
+				static_cast<Foo*>(foos[randomNumber].pointer)->~Foo();
+				slabAllocator.operator delete(foos[randomNumber].pointer, sizeof(Foo));
+			}
+
+			else if (foos[randomNumber].sizeOfObjectThere == sizeof(EpicFoo))
+			{
+				static_cast<EpicFoo*>(foos[randomNumber].pointer)->~EpicFoo();
+				slabAllocator.operator delete(foos[randomNumber].pointer, sizeof(EpicFoo));
+			}
+
+			else if (foos[randomNumber].sizeOfObjectThere == sizeof(GiantFoo))
+			{
+				static_cast<GiantFoo*>(foos[randomNumber].pointer)->~GiantFoo();
+				slabAllocator.operator delete(foos[randomNumber].pointer, sizeof(GiantFoo));
+			}
+		}
+	}
+
+	if (typeDelete == TypeDelete::BeginEnd)
+	{
+		for (size_t i = 0; i < size; ++i)
+		{
+			int randomNumber = i;
+
+			if (foos[randomNumber].sizeOfObjectThere == sizeof(Foo))
+			{
+				static_cast<Foo*>(foos[randomNumber].pointer)->~Foo();
+				slabAllocator.operator delete(foos[randomNumber].pointer, sizeof(Foo));
+			}
+
+			else if (foos[randomNumber].sizeOfObjectThere == sizeof(EpicFoo))
+			{
+				static_cast<EpicFoo*>(foos[randomNumber].pointer)->~EpicFoo();
+				slabAllocator.operator delete(foos[randomNumber].pointer, sizeof(EpicFoo));
+			}
+
+			else if (foos[randomNumber].sizeOfObjectThere == sizeof(GiantFoo))
+			{
+				static_cast<GiantFoo*>(foos[randomNumber].pointer)->~GiantFoo();
+				slabAllocator.operator delete(foos[randomNumber].pointer, sizeof(GiantFoo));
+			}
+		}
+	}
+
+	if (typeDelete == TypeDelete::BeginEnd)
+	{
+		for (size_t i = 0; i < size; ++i)
+		{
+			int randomNumber = GenerateRandomNumber(0, foos.size() - i - 1);
+
+			if (foos[randomNumber].sizeOfObjectThere == sizeof(Foo))
+			{
+				static_cast<Foo*>(foos[randomNumber].pointer)->~Foo();
+				slabAllocator.operator delete(foos[randomNumber].pointer, sizeof(Foo));
+			}
+
+			else if (foos[randomNumber].sizeOfObjectThere == sizeof(EpicFoo))
+			{
+				static_cast<EpicFoo*>(foos[randomNumber].pointer)->~EpicFoo();
+				slabAllocator.operator delete(foos[randomNumber].pointer, sizeof(EpicFoo));
+			}
+
+			else if (foos[randomNumber].sizeOfObjectThere == sizeof(GiantFoo))
+			{
+				static_cast<GiantFoo*>(foos[randomNumber].pointer)->~GiantFoo();
+				slabAllocator.operator delete(foos[randomNumber].pointer, sizeof(GiantFoo));
+			}
+		}
+	}
+
+	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << '\n';
+}
+
 void UnitTests::Allocate_Via_Slab_AllObjects_Add_Delete(const BuddyAllocatorObject&, const SmallObject& smallObject)
 {
 	std::cout << "UnitTests::Allocate_Via_Slab_AllObjects_Add_Delete(): ";

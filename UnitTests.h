@@ -100,6 +100,7 @@ struct UnitTests
 	void Allocate_Via_Slab_BigObjects_Add_Delete(const BuddyAllocatorObject&, const SmallObject&);
 	void Allocate_Via_Slab_AllObjects_Add_Delete(const BuddyAllocatorObject&, const SmallObject&);
 	void Allocate_Via_Slab_RandomObject_DeleteRandomPosition(const BuddyAllocatorObject&, const SmallObject&, const TypeDelete);
+	void Allocate_Via_Slab_RandomObject_Add_DeleteRandomPosition(const BuddyAllocatorObject&, const SmallObject&, const TypeDelete);
 
 	void Allocate_Via_Default_SmallObjects();
 	void Allocate_Via_Default_SmallObjects_Add_Delete();
