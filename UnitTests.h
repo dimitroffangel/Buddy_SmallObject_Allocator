@@ -92,14 +92,14 @@ struct UnitTests
 	void Allocate_Via_Buddy_RandomObject_DeleteRandomPosition(const BuddyAllocatorObject&, const SmallObject&, const TypeDelete);
 	void Allocate_Via_Buddy_RandomObject_Add_DeleteRandomPosition(const BuddyAllocatorObject& , const SmallObject&, const TypeDelete);
 
-	void Allocate_Via_Slab_SmallObjects(const BuddyAllocatorObject&, const SmallObject&);
+	void Allocate_Via_Slab_SmallObjects(const BuddyAllocatorObject&, const SmallObject&, const TypeDelete);
 	void Allocate_Via_Slab_SmallObjects_Add_Delete(const BuddyAllocatorObject&, const SmallObject&);
-	void Allocate_Via_Slab_MediumObjects(const BuddyAllocatorObject&, const SmallObject&);
+	void Allocate_Via_Slab_MediumObjects(const BuddyAllocatorObject&, const SmallObject&, const TypeDelete);
 	void Allocate_Via_Slab_MediumObjects_Add_Delete(const BuddyAllocatorObject&, const SmallObject&);
-	void Allocate_Via_Slab_BigObjects(const BuddyAllocatorObject&, const SmallObject&);
+	void Allocate_Via_Slab_BigObjects(const BuddyAllocatorObject&, const SmallObject&, const TypeDelete);
 	void Allocate_Via_Slab_BigObjects_Add_Delete(const BuddyAllocatorObject&, const SmallObject&);
 	void Allocate_Via_Slab_AllObjects_Add_Delete(const BuddyAllocatorObject&, const SmallObject&);
-	void Allocate_Via_Slab_RandomObject_DeleteRandomPosition(const BuddyAllocatorObject&, const SmallObject&);
+	void Allocate_Via_Slab_RandomObject_DeleteRandomPosition(const BuddyAllocatorObject&, const SmallObject&, const TypeDelete);
 
 	void Allocate_Via_Default_SmallObjects();
 	void Allocate_Via_Default_SmallObjects_Add_Delete();

@@ -604,7 +604,8 @@ void UnitTests::Allocate_Via_Buddy_RandomObject_Add_DeleteRandomPosition(const B
 	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << '\n';
 }
 
-void UnitTests::Allocate_Via_Slab_SmallObjects(const BuddyAllocatorObject& buddyAllocator, const SmallObject& smallObject)
+void UnitTests::Allocate_Via_Slab_SmallObjects(const BuddyAllocatorObject& buddyAllocator, const SmallObject& smallObject, 
+	const TypeDelete typeDelete)
 {
 	std::cout << "UnitTests::Allocate_Via_Slab_SmallObjects(): ";
 
@@ -631,19 +632,44 @@ void UnitTests::Allocate_Via_Slab_SmallObjects(const BuddyAllocatorObject& buddy
 		foos.push_back(result);
 	}
 
-
-	for (size_t i = 0; i < size; i++)
+	if (typeDelete == TypeDelete::EndBegin)
 	{
-		foos[size - i - 1]->~Foo();
+		for (size_t i = 0; i < size; i++)
+		{
+			foos[size - i - 1]->~Foo();
 
-		smallObject.operator delete(foos[size - i - 1], sizeof(Foo));
+			smallObject.operator delete(foos[size - i - 1], sizeof(Foo));
+		}
+	}
+
+	if (typeDelete == TypeDelete::BeginEnd)
+	{
+		for (size_t i = 0; i < size; i++)
+		{
+			foos[i]->~Foo();
+
+			smallObject.operator delete(foos[i], sizeof(Foo));
+		}
+	}
+
+	if (typeDelete == TypeDelete::Random)
+	{
+		for (size_t i = 0; i < size; i++)
+		{
+			int randomNumber = GenerateRandomNumber(0, size - i - 1);
+			
+			foos[randomNumber]->~Foo();
+
+			smallObject.operator delete(foos[randomNumber], sizeof(Foo));
+		}
 	}
 
 	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << '\n';
 }
 
-void UnitTests::Allocate_Via_Slab_MediumObjects(const BuddyAllocatorObject& buddyObject, const SmallObject& smallObject)
+void UnitTests::Allocate_Via_Slab_MediumObjects(const BuddyAllocatorObject& buddyObject, const SmallObject& smallObject, 
+	const TypeDelete typeDelete)
 {
 	std::cout << "UnitTests::Allocate_Via_Slab_MediumObjects(): ";
 
@@ -662,7 +688,6 @@ void UnitTests::Allocate_Via_Slab_MediumObjects(const BuddyAllocatorObject& budd
 
 	for (size_t i = 0; i < size; i++)
 	{
-		//void* rawPointer = smallObject.operator new(sizeOfFoo);
 		void* rawPointer = smallObject.operator new(sizeof(EpicFoo));
 
 		EpicFoo* result = new (rawPointer) EpicFoo();
@@ -671,11 +696,35 @@ void UnitTests::Allocate_Via_Slab_MediumObjects(const BuddyAllocatorObject& budd
 	}
 
 
-	for (size_t i = 0; i < size; i++)
+	if (typeDelete == TypeDelete::EndBegin)
 	{
-		foos[size - i - 1]->~EpicFoo();
+		for (size_t i = 0; i < size; i++)
+		{
+			foos[size - i - 1]->~EpicFoo();
 
-		smallObject.operator delete(foos[size - i - 1], sizeof(EpicFoo));
+			smallObject.operator delete(foos[size - i - 1], sizeof(EpicFoo));
+		}
+	}
+
+	if (typeDelete == TypeDelete::BeginEnd)
+	{
+		for (size_t i = 0; i < size; i++)
+		{
+			foos[i]->~EpicFoo();
+
+			smallObject.operator delete(foos[i], sizeof(EpicFoo));
+		}
+	}
+
+	if (typeDelete == TypeDelete::Random)
+	{
+		for (size_t i = 0; i < size; i++)
+		{
+			int randomNumber = GenerateRandomNumber(0, size - i - 1);
+			foos[randomNumber]->~EpicFoo();
+
+			smallObject.operator delete(foos[randomNumber], sizeof(EpicFoo));
+		}
 	}
 
 	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
@@ -751,7 +800,7 @@ void UnitTests::Allocate_Via_Slab_SmallObjects_Add_Delete(const BuddyAllocatorOb
 	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << '\n';
 }
 
-void UnitTests::Allocate_Via_Slab_BigObjects(const BuddyAllocatorObject&, const SmallObject& smallObject)
+void UnitTests::Allocate_Via_Slab_BigObjects(const BuddyAllocatorObject&, const SmallObject& smallObject, const TypeDelete typeDelete)
 {
 	std::cout << "UnitTests::Allocate_Via_Slab_BigObjects(): ";
 
@@ -778,11 +827,35 @@ void UnitTests::Allocate_Via_Slab_BigObjects(const BuddyAllocatorObject&, const 
 	}
 
 
-	for (size_t i = 0; i < size; i++)
+	if (typeDelete == TypeDelete::EndBegin)
 	{
-		foos[size - i - 1]->~GiantFoo();
+		for (size_t i = 0; i < size; i++)
+		{
+			foos[size - i - 1]->~GiantFoo();
 
-		smallObject.operator delete(foos[size - i - 1], sizeof(GiantFoo));
+			smallObject.operator delete(foos[size - i - 1], sizeof(GiantFoo));
+		}
+	}
+
+	if (typeDelete == TypeDelete::BeginEnd)
+	{
+		for (size_t i = 0; i < size; i++)
+		{
+			foos[i]->~GiantFoo();
+
+			smallObject.operator delete(foos[i], sizeof(GiantFoo));
+		}
+	}
+
+	if (typeDelete == TypeDelete::BeginEnd)
+	{
+		for (size_t i = 0; i < size; i++)
+		{
+			int randomNumber = GenerateRandomNumber(0, size - i - 1);
+			foos[randomNumber]->~GiantFoo();
+
+			smallObject.operator delete(foos[randomNumber], sizeof(GiantFoo));
+		}
 	}
 
 	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
@@ -824,7 +897,8 @@ void UnitTests::Allocate_Via_Slab_BigObjects_Add_Delete(const BuddyAllocatorObje
 	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << '\n';
 }
 
-void UnitTests::Allocate_Via_Slab_RandomObject_DeleteRandomPosition(const BuddyAllocatorObject&, const SmallObject& smallObject)
+void UnitTests::Allocate_Via_Slab_RandomObject_DeleteRandomPosition(const BuddyAllocatorObject&, const SmallObject& smallObject, 
+	const TypeDelete typeDelete)
 {
 	std::cout << "UnitTests::Allocate_Via_Slab_RandomObject_DeleteRandomPosition(): ";
 
@@ -869,16 +943,52 @@ void UnitTests::Allocate_Via_Slab_RandomObject_DeleteRandomPosition(const BuddyA
 		epicFoos.push_back(res3);
 	}
 
-	for (size_t i = 0; i < size; ++i)
+
+	if (typeDelete == TypeDelete::EndBegin)
 	{
-		foos[i]->~Foo();
-		smallObject.operator delete(foos[i], sizeof(Foo));
+		for (size_t i = 0; i < size; ++i)
+		{
+			foos[size - i - 1]->~Foo();
+			smallObject.operator delete(foos[size - i - 1], sizeof(Foo));
 
-		epicFoos[i]->~EpicFoo();
-		smallObject.operator delete(epicFoos[i], sizeof(EpicFoo));
+			epicFoos[size - i - 1]->~EpicFoo();
+			smallObject.operator delete(epicFoos[size - i - 1], sizeof(EpicFoo));
 
-		giantFoos[i]->~GiantFoo();
-		smallObject.operator delete(giantFoos[i], sizeof(GiantFoo));
+			giantFoos[size - i - 1]->~GiantFoo();
+			smallObject.operator delete(giantFoos[size - i - 1], sizeof(GiantFoo));
+		}
+	}
+
+	if (typeDelete == TypeDelete::BeginEnd)
+	{
+		for (size_t i = 0; i < size; ++i)
+		{
+			foos[i]->~Foo();
+			smallObject.operator delete(foos[i], sizeof(Foo));
+
+			epicFoos[i]->~EpicFoo();
+			smallObject.operator delete(epicFoos[i], sizeof(EpicFoo));
+
+			giantFoos[i]->~GiantFoo();
+			smallObject.operator delete(giantFoos[i], sizeof(GiantFoo));
+		}
+	}
+
+	if (typeDelete == TypeDelete::Random)
+	{
+		for (size_t i = 0; i < size; ++i)
+		{
+			int randomNumber = GenerateRandomNumber(0, size - i - 1);
+
+			foos[randomNumber]->~Foo();
+			smallObject.operator delete(foos[randomNumber], sizeof(Foo));
+
+			epicFoos[randomNumber]->~EpicFoo();
+			smallObject.operator delete(epicFoos[randomNumber], sizeof(EpicFoo));
+
+			giantFoos[randomNumber]->~GiantFoo();
+			smallObject.operator delete(giantFoos[randomNumber], sizeof(GiantFoo));
+		}
 	}
 
 	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
