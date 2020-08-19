@@ -112,14 +112,16 @@ struct UnitTests
 	void Allocate_Via_Default_RandomObject_DeleteRandomPosition(const TypeDelete);
 	void Allocate_Via_Default_RandomObject_Add_DeleteRandomPosition(const TypeDelete);
 
-	void Allocate_Via_MallocFree_SmallObjects();
+	void Allocate_Via_MallocFree_SmallObjects(const TypeDelete);
 	void Allocate_Via_MallocFree_SmallObjects_Add_Delete();
-	void Allocate_Via_MallocFree_MediumObjects();
+	void Allocate_Via_MallocFree_MediumObjects(const TypeDelete);
 	void Allocate_Via_MallocFree_MediumObjects_Add_Delete();
-	void Allocate_Via_MallocFree_BigObjects();
+	void Allocate_Via_MallocFree_BigObjects(const TypeDelete);
 	void Allocate_Via_MallocFree_BigObjects_Add_Delete();
 	void Allocate_Via_MallocFree_AllObjects_Add_Delete();
-	void Allocate_Via_MallocFree_RandomObject_DeleteRandomPosition();
+	void Allocate_Via_MallocFree_RandomObject_DeleteRandomPosition(const TypeDelete);
+	void Allocate_Via_MallocFree_RandomObject_Add_DeleteRandomPosition(const TypeDelete);
+
 };
 
 #endif

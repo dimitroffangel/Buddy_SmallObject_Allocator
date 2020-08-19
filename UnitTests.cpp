@@ -1700,7 +1700,7 @@ void UnitTests::Allocate_Via_Default_RandomObject_Add_DeleteRandomPosition(const
 	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << '\n';
 }
 
-void UnitTests::Allocate_Via_MallocFree_SmallObjects()
+void UnitTests::Allocate_Via_MallocFree_SmallObjects(const TypeDelete typeDelete)
 {
 	std::cout << "UnitTests:: Allocate_Via_MallocFree_SmallObjects(): ";
 
@@ -1725,10 +1725,33 @@ void UnitTests::Allocate_Via_MallocFree_SmallObjects()
 	}
 
 
-	for (size_t i = 0; i < size; i++)
+	if (typeDelete == TypeDelete::BeginEnd)
 	{
-		foos[i]->~Foo();
-		free(foos[i]);
+		for (size_t i = 0; i < size; i++)
+		{
+			foos[i]->~Foo();
+			free(foos[i]);
+		}
+	}
+
+	if (typeDelete == TypeDelete::EndBegin)
+	{
+		for (size_t i = 0; i < size; i++)
+		{
+			foos[size - i - 1]->~Foo();
+			free(foos[size - i - 1]);
+		}
+	}
+
+	if (typeDelete == TypeDelete::Random)
+	{
+		for (size_t i = 0; i < size; i++)
+		{
+			const int randomNumber = GenerateRandomNumber(0, size - i - 1);
+
+			foos[randomNumber]->~Foo();
+			free(foos[randomNumber]);
+		}
 	}
 
 	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
@@ -1766,7 +1789,7 @@ void UnitTests::Allocate_Via_MallocFree_SmallObjects_Add_Delete()
 	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << '\n';
 }
 
-void UnitTests::Allocate_Via_MallocFree_MediumObjects()
+void UnitTests::Allocate_Via_MallocFree_MediumObjects(const TypeDelete typeDelete)
 {
 	std::cout << "UnitTests::Allocate_Via_MallocFree_MediumObjects(): ";
 
@@ -1790,11 +1813,34 @@ void UnitTests::Allocate_Via_MallocFree_MediumObjects()
 		foos.push_back(result1);
 	}
 
-
-	for (size_t i = 0; i < size; i++)
+	
+	if (typeDelete == TypeDelete::BeginEnd)
 	{
-		foos[i]->~EpicFoo();
-		free(foos[i]);
+		for (size_t i = 0; i < size; i++)
+		{
+			foos[i]->~EpicFoo();
+			free(foos[i]);
+		}
+	}
+
+	if (typeDelete == TypeDelete::EndBegin)
+	{
+		for (size_t i = 0; i < size; i++)
+		{
+			foos[size - i - 1]->~EpicFoo();
+			free(foos[size - i - 1]);
+		}
+	}
+
+	if (typeDelete == TypeDelete::Random)
+	{
+		for (size_t i = 0; i < size; i++)
+		{
+			const int randomNumber = GenerateRandomNumber(0, size - i - 1);
+
+			foos[randomNumber]->~EpicFoo();
+			free(foos[randomNumber]);
+		}
 	}
 
 	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
@@ -1832,7 +1878,7 @@ void UnitTests::Allocate_Via_MallocFree_MediumObjects_Add_Delete()
 	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << '\n';
 }
 
-void UnitTests::Allocate_Via_MallocFree_BigObjects()
+void UnitTests::Allocate_Via_MallocFree_BigObjects(const TypeDelete typeDelete)
 {
 	std::cout << "UnitTests::Allocate_Via_MallocFree_BigObjects(): ";
 
@@ -1856,11 +1902,35 @@ void UnitTests::Allocate_Via_MallocFree_BigObjects()
 		foos.push_back(result1);
 	}
 
-	for (size_t i = 0; i < size; i++)
+	if (typeDelete == TypeDelete::BeginEnd)
 	{
-		foos[i]->~GiantFoo();
-		free(foos[i]);
+		for (size_t i = 0; i < size; i++)
+		{
+			foos[i]->~GiantFoo();
+			free(foos[i]);
+		}
 	}
+	
+	if (typeDelete == TypeDelete::EndBegin)
+	{
+		for (size_t i = 0; i < size; i++)
+		{
+			foos[size - i - 1]->~GiantFoo();
+			free(foos[size - i - 1]);
+		}
+	}
+
+	if (typeDelete == TypeDelete::Random)
+	{
+		for (size_t i = 0; i < size; i++)
+		{
+			const int randomNumber = GenerateRandomNumber(0, size - i - 1);
+
+			foos[randomNumber]->~GiantFoo();
+			free(foos[randomNumber]);
+		}
+	}
+
 
 	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << '\n';
@@ -1949,7 +2019,7 @@ void UnitTests::Allocate_Via_MallocFree_AllObjects_Add_Delete()
 	std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << '\n';
 }
 
-void UnitTests::Allocate_Via_MallocFree_RandomObject_DeleteRandomPosition()
+void UnitTests::Allocate_Via_MallocFree_RandomObject_DeleteRandomPosition(const TypeDelete typeDelete)
 {
 	std::cout << "UnitTests::Allocate_Via_MallocFree_RandomObject_DeleteRandomPosition(): ";
 
@@ -1987,16 +2057,51 @@ void UnitTests::Allocate_Via_MallocFree_RandomObject_DeleteRandomPosition()
 		epicFoos.push_back(result3);
 	}
 
-	for (size_t i = 0; i < size; ++i)
+	if (typeDelete == TypeDelete::BeginEnd)
 	{
-		foos[i]->~Foo();
-		free(foos[i]);
+		for (size_t i = 0; i < size; ++i)
+		{
+			foos[i]->~Foo();
+			free(foos[i]);
 
-		epicFoos[i]->~EpicFoo();
-		free(epicFoos[i]);
+			epicFoos[i]->~EpicFoo();
+			free(epicFoos[i]);
 
-		giantFoos[i]->~GiantFoo();
-		free(giantFoos[i]);
+			giantFoos[i]->~GiantFoo();
+			free(giantFoos[i]);
+		}
+	}
+
+	if (typeDelete == TypeDelete::EndBegin)
+	{
+		for (size_t i = 0; i < size; ++i)
+		{
+			foos[size - i - 1]->~Foo();
+			free(foos[size - i - 1]);
+
+			epicFoos[size - i - 1]->~EpicFoo();
+			free(epicFoos[size - i - 1]);
+
+			giantFoos[size - i - 1]->~GiantFoo();
+			free(giantFoos[size - i - 1]);
+		}
+	}
+
+	if (typeDelete == TypeDelete::Random)
+	{
+		for (size_t i = 0; i < size; ++i)
+		{
+			const int randomNumber = GenerateRandomNumber(0, size - i - 1);
+
+			foos[randomNumber]->~Foo();
+			free(foos[randomNumber]);
+
+			epicFoos[randomNumber]->~EpicFoo();
+			free(epicFoos[i]);
+
+			giantFoos[randomNumber]->~GiantFoo();
+			free(giantFoos[randomNumber]);
+		}
 	}
 
 	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
