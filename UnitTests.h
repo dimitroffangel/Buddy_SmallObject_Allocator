@@ -62,6 +62,13 @@ class GiantFoo
 }; // 2^9 + 2^5 + 2^5 = 2^9 + 64 = 512 + 64 = 576 -> 64 bit machine
 // 2^9 + 16 + 32 = 512 + 48 = 560 -> 32 bit machine  
 
+enum TypeDelete
+{
+	BeginEnd,
+	EndBegin,
+	Random
+};
+
 struct UnitTests
 {
 	void Allocate_Via_Buddy_SmallObjects(const BuddyAllocatorObject&, const SmallObject&);
@@ -90,7 +97,6 @@ struct UnitTests
 	void Allocate_Via_Default_BigObjects_Add_Delete();
 	void Allocate_Via_Default_AllObjects_Add_Delete();
 	void Allocate_Via_Default_RandomObject_DeleteRandomPosition();
-
 
 	void Allocate_Via_MallocFree_SmallObjects();
 	void Allocate_Via_MallocFree_SmallObjects_Add_Delete();
