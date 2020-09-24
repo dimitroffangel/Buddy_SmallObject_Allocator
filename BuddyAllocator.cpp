@@ -263,12 +263,18 @@ BuddyAllocator* g_BuddyAllocator = nullptr;
 
 void BuddyAllocator::Initialize()
 {
+	if (g_BuddyAllocator != nullptr)
+	{
+		return;
+	}
+
 	g_BuddyAllocator = new BuddyAllocator();
 }
 
 void BuddyAllocator::Shutdown()
 {
 	delete g_BuddyAllocator;
+	g_BuddyAllocator = nullptr;
 }
 
 void BuddyAllocator::Deallocate(void* pointer, size_t blockSize)

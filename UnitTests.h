@@ -1,7 +1,6 @@
 #ifndef UNITTESTS_H_GUARD
 #define UNITTESTS_H_GUARD
 
-
 #include "SmallObject.h"
 #include "BuddyAllocator.h"
 #include "BuddyAllocatorObject.h"

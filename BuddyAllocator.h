@@ -29,14 +29,14 @@ class BuddyAllocator
 	static const int MAX_LEVELS = 31;
 	static const size_t NUMBER_OF_BITSET_FOR_FREE_TABLE = DEFAULT_BUDDY_ALLOCATOR_SIZE / LEAF_SIZE;
 
-public:
+private:
 	BuddyAllocator();
 	~BuddyAllocator();
 	BuddyAllocator(const BuddyAllocator& other) = delete;
 	BuddyAllocator& operator=(const BuddyAllocator& rhs) = delete;
 
+public:
 	static void Initialize();
-
 	static void Shutdown();
 
 private:
@@ -159,7 +159,6 @@ public:
 		return indexInLevelOfPointer - 1;
 	}
 }; 
-
 
 extern BuddyAllocator* g_BuddyAllocator;
 

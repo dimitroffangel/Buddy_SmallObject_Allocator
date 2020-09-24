@@ -3,6 +3,7 @@
 #include <chrono>
 
 #include "SmallObjectAllocator.h"
+#include <bitset>
 
 int GenerateRandomNumber(int from, int to)
 {
@@ -265,9 +266,19 @@ void UnitTests::Allocate_Via_Buddy_BigObjects(const BuddyAllocatorObject& buddyA
 
 	if (typeDelete == TypeDelete::Random)
 	{
+		std::bitset<size> hasElementBeenDeleted;
+		hasElementBeenDeleted.reset();
+
 		for (size_t i = 0; i < size; i++)
 		{
 			int randomNumber = GenerateRandomNumber(0, foos.size() - i - 1);
+
+			while (hasElementBeenDeleted[randomNumber])
+			{
+				randomNumber = GenerateRandomNumber(0, foos.size() - i - 1);
+			}
+
+			hasElementBeenDeleted[randomNumber] = 1;
 
 			foos[randomNumber]->~GiantFoo();
 
@@ -847,7 +858,7 @@ void UnitTests::Allocate_Via_Slab_BigObjects(const BuddyAllocatorObject&, const 
 		}
 	}
 
-	if (typeDelete == TypeDelete::BeginEnd)
+	if (typeDelete == TypeDelete::Random)
 	{
 		for (size_t i = 0; i < size; i++)
 		{
